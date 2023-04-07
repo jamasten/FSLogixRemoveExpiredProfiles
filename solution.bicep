@@ -1,10 +1,11 @@
-@description('The URL prefix for linked resources.')
-param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/Azure/master/solutions/fslogixDiskShrinkAutomation/artifacts/'
+@description('The URL prefix for remote assets.')
+param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/FSLogixRemoveExpiredProfiles/main/artifacts/'
 
 @secure()
 @description('The SAS Token for the scripts if they are stored on an Azure Storage Account.')
 param _artifactsLocationSasToken string = ''
 
+@description('The amount of days to keep an unused FSLogix profile before deleting it.')
 param DeleteOlderThanDays int
 
 @allowed([
@@ -13,13 +14,19 @@ param DeleteOlderThanDays int
   's' // Shared Services
   't' // Test
 ])
-@description('The target environment for the solution.')
+@description('The environment short name used for naming resources in the solution.')
 param Environment string = 'd'
 
-@description('The names of the files shares containing the FSLogix containers.')
-param FileShareResourceIds array = [
-  
-]
+@description('The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers.')
+param FileShareResourceIds array
+
+@allowed([
+  'Day'
+  'Week'
+  'Month'
+])
+@description('The frequency in which to check for expired VHDs.')
+param Frequency string
 
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false
@@ -28,55 +35,40 @@ param HybridUseBenefit bool = false
 @description('The unique identifier between each business unit or project supporting AVD in your tenant. This is the unique naming component between each AVD stamp.')
 param Identifier string = 'avd'
 
+@description('DO NOT MODIFY THIS VALUE! The name of the Job Schedule must be set as a unique GUID during each deployment.')
 param JobScheduleName string = newGuid()
 
+@description('The deployment location for the solution.')
 param Location string = resourceGroup().location
 
+@description('The resource ID for the Log Analytics Workspace to collect log data and send alerts.')
+param LogAnalyticsWorkspaceResourceId string = ''
 
 @description('The date and time the tool should run weekly. Ideally select a time when most or all users will offline.')
-param RecurrenceDateTime string = '2022-08-27T23:00:00'
-
-@description('The stamp index specifies the AVD stamp within an Azure environment.')
-param StampIndex int = 0
-
-@description('The names of the Azure Storage Accounts containing the file shares for FSLogix.')
-param StorageAccountNames array = [
-  'stfspeovad0000'
-]
-
-@description('The names of the Azure Resource Groups containing the Azure Storage Accounts. A resource group must be listed for each Storage Account even if the same Resource Group is listed multiple times.')
-param StorageAccountResourceGroupNames array = [
-  'rg-fs-peo-va-d-storage-00'
-]
+param RecurrenceDateTime string = '2023-01-01T23:00:00'
 
 @description('The subnet for the AVD session hosts.')
 param SubnetName string = 'Clients'
 
-param Tags object = {
-  Purpose: 'Fslogix Disk Shrink tool'
-}
-
-param Time string = utcNow()
-
-@description('DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter.')
-param Timestamp string = utcNow('yyyyMMddhhmmss')
+@description('Add key / value pairs to include metadata on the Azure resources.')
+param Tags object = {}
 
 @description('Virtual network for the virtual machine to run the tool.')
-param VirtualNetworkName string = 'vnet-shd-net-d-va'
+param VirtualNetworkName string
 
 @description('Virtual network resource group for the virtual machine to run the tool.')
-param VirtualNetworkResourceGroupName string = 'rg-shd-net-d-va'
+param VirtualNetworkResourceGroupName string
 
 @secure()
+@description('The local administrator password for the virtual machine.')
 param VmPassword string
 
-param VmSize string = 'Standard_D4s_v4'
+@description('The size of the virutal machine that will process the Azure Files shares.')
+param VmSize string = 'Standard_D4ds_v5'
 
 @secure()
+@description('The local administrator username for the virtual machine.')
 param VmUsername string
-
-@description('ISO 8601 timestamp used to determine the webhook expiration date.  The webhook is hardcoded to expire 5 years after the timestamp.')
-param WebhookTimestamp string = utcNow('u')
 
 
 var AutomationAccountName = 'aa-${NamingStandard}'
@@ -136,12 +128,12 @@ var LocationShortNames = {
   westus2: 'wu2'
   westus3: 'wu3'
 }
-var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}-${StampIndexFull}-fds'
+var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}-fslogix'
 var NicName = 'nic-${NamingStandard}'
-var RoleAssignmentResourceGroups = union([
+var RoleAssignmentResourceGroups = [
   resourceGroup().name
   VirtualNetworkResourceGroupName
-], StorageAccountResourceGroupNames)
+]
 var RoleDefinitionIds = {
   KeyVaultSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
   ManagedIdentityOperator: 'f1a07417-d97a-45cb-824c-7a7467783830'
@@ -149,8 +141,6 @@ var RoleDefinitionIds = {
 }
 var RunbookName = 'FslogixDiskShrink'
 var RunbookScriptName = 'Set-FslogixDiskShrinkVirtualMachine.ps1'
-var StampIndexFull = padLeft(StampIndex, 2, '0')
-var StorageAccountSuffix = environment().suffixes.storage
 var TemplateSpecName = 'ts-${NamingStandard}'
 var TimeZone = TimeZones[Location]
 var TimeZones = {
@@ -211,7 +201,7 @@ var TimeZones = {
   westus3: 'Mountain Standard Time'
 }
 var UserAssignedIdentityName = 'uai-${NamingStandard}'
-var VmName = 'vm${Identifier}${Environment}${LocationShortName}${StampIndexFull}fds'
+var VmName = 'vm-${NamingStandard}'
 
 
 // The User Assigned Identity is attached to the virtual machine when its deployed so it has access to grab Key Vault secrets
@@ -330,17 +320,6 @@ resource secret_SasToken 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = if(!em
   }
 }
 
-// Key Vault Secrets for the Storage Account keys so the SMB share can be mounted as an admin on the virtual machine
-module secrets_StorageAccountKeys 'modules/storageAccountKeys.bicep' = [for i in range(0, length(StorageAccountNames)): {
-  name: 'KeyVaultSecret_${StorageAccountNames[i]}_${Timestamp}'
-  //scope: resourceGroup(StorageAccountResourceGroupNames[i])
-  params: {
-    KeyVaultName: keyVault.name
-    StorageAccount: StorageAccountNames[i]
-    StorageAccountResourceGroup: StorageAccountResourceGroupNames[i]
-  }
-}]
-
 // Key Vault Secret for the local admin password on the virtual machine
 resource secret_VmPassword 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
   parent: keyVault
@@ -383,11 +362,11 @@ resource roleAssignment_KeyVaultSecretsUser02 'Microsoft.Authorization/roleAssig
 
 resource schedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
   parent: automationAccount
-  name: '${StorageAccountName}_${FileShareName}'
+  name: '${RunbookName}_${Frequency}'
   properties: {
     frequency: 'Day'
     interval: 1
-    startTime: dateTimeAdd(Time, 'PT15M')
+    startTime: RecurrenceDateTime
     timeZone: TimeZone
   }
 }
@@ -398,19 +377,18 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
   properties: {
     parameters: {
       _artifactsLoction: _artifactsLocation
-      DeleteOlderThanDays: DeleteOlderThanDays
-      Environment: environment().name
-      FileShareNames: join(FileShareNames, ',')
-      HybridUseBenefit: HybridUseBenefit
+      DeleteOlderThanDays: string(DeleteOlderThanDays)
+      DiskName: DiskName
+      EnvironmentName: environment().name
+      FileShareResourceIds: string(FileShareResourceIds)
+      HybridUseBenefit: string(HybridUseBenefit)
       KeyVaultName: keyVault.name
       Location: Location
       NicName: NicName
       ResourceGroupName: resourceGroup().name
-      StorageAccountNames: join(StorageAccountNames, ',')
-      StorageAccountSuffix: StorageAccountSuffix
       SubnetName: SubnetName
       SubscriptionId: subscription().subscriptionId
-      Tags: Tags
+      Tags: string(Tags)
       TemplateSpecId: templateSpecVersion.id
       TenantId: subscription().tenantId
       UserAssignedIdentityClientId: userAssignedIdentity.properties.clientId
