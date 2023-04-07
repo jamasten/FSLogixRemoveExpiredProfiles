@@ -3,26 +3,27 @@ param _artifactsLocation string
 param _artifactsLocationSasToken string = ''
 param DeleteOlderThanDays int
 param DiskName string
-param FileShareNames array
+param FileShareResourceIds array
 param HybridUseBenefit bool
 param KeyVaultName string
 param Location string
 param NicName string
-param StorageAccountNames array
-param StorageAccountSuffix string
-param Subnet string
+param SubnetName string
 param Tags object
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 param UserAssignedIdentityClientId string
 param UserAssignedIdentityResourceId string
-param VirtualNetwork string
-param VirtualNetworkResourceGroup string
+param VirtualNetworkName string
+param VirtualNetworkResourceGroupName string
 param VmName string
 @secure()
 param VmPassword string
 param VmSize string
 @secure()
 param VmUsername string
+
+
+var StorageAccountSuffix = environment().suffixes.storage
 
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = {
@@ -36,14 +37,14 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = {
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: resourceId(VirtualNetworkResourceGroup, 'Microsoft.Network/virtualNetworks/subnets', VirtualNetwork, Subnet)
+            id: resourceId(VirtualNetworkResourceGroupName, 'Microsoft.Network/virtualNetworks/subnets', VirtualNetworkName, SubnetName)
           }
           primary: true
           privateIPAddressVersion: 'IPv4'
         }
       }
     ]
-    enableAcceleratedNetworking: false
+    enableAcceleratedNetworking: true
     enableIPForwarding: false
   }
 }
@@ -73,7 +74,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-11-01' = {
         deleteOption: 'Delete'
         osType: 'Windows'
         createOption: 'FromImage'
-        caching: 'None'
+        caching: 'ReadWrite'
         managedDisk: {
           storageAccountType: 'Premium_LRS'
         }
@@ -128,7 +129,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareNames ${FileShareNames} -KeyVaultName ${KeyVaultName} -StorageAccountNames ${StorageAccountNames} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareResourceIds ${FileShareResourceIds} -KeyVaultName ${KeyVaultName} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
     }
   }
 }

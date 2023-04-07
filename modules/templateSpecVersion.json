@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.15.31.15270",
-      "templateHash": "11693431337822803718"
+      "version": "0.16.1.55165",
+      "templateHash": "9341956204983815761"
     }
   },
   "parameters": {
@@ -22,7 +22,7 @@
     "DiskName": {
       "type": "string"
     },
-    "FileShareNames": {
+    "FileShareResourceIds": {
       "type": "array"
     },
     "HybridUseBenefit": {
@@ -37,13 +37,7 @@
     "NicName": {
       "type": "string"
     },
-    "StorageAccountNames": {
-      "type": "array"
-    },
-    "StorageAccountSuffix": {
-      "type": "string"
-    },
-    "Subnet": {
+    "SubnetName": {
       "type": "string"
     },
     "Tags": {
@@ -59,10 +53,10 @@
     "UserAssignedIdentityResourceId": {
       "type": "string"
     },
-    "VirtualNetwork": {
+    "VirtualNetworkName": {
       "type": "string"
     },
-    "VirtualNetworkResourceGroup": {
+    "VirtualNetworkResourceGroupName": {
       "type": "string"
     },
     "VmName": {
@@ -78,6 +72,9 @@
       "type": "securestring"
     }
   },
+  "variables": {
+    "StorageAccountSuffix": "[environment().suffixes.storage]"
+  },
   "resources": [
     {
       "type": "Microsoft.Network/networkInterfaces",
@@ -92,14 +89,14 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "subnet": {
-                "id": "[resourceId(parameters('VirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetwork'), parameters('Subnet'))]"
+                "id": "[resourceId(parameters('VirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('SubnetName'))]"
               },
               "primary": true,
               "privateIPAddressVersion": "IPv4"
             }
           }
         ],
-        "enableAcceleratedNetworking": false,
+        "enableAcceleratedNetworking": true,
         "enableIPForwarding": false
       }
     },
@@ -130,7 +127,7 @@
             "deleteOption": "Delete",
             "osType": "Windows",
             "createOption": "FromImage",
-            "caching": "None",
+            "caching": "ReadWrite",
             "managedDisk": {
               "storageAccountType": "Premium_LRS"
             },
@@ -188,7 +185,7 @@
           "timestamp": "[parameters('Timestamp')]"
         },
         "protectedSettings": {
-          "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareNames {2} -KeyVaultName {3} -StorageAccountNames {4} -StorageAccountSuffix {5} -SubscriptionId {6} -TenantId {7} -UserAssignedIdentityClientId {8}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareNames'), parameters('KeyVaultName'), parameters('StorageAccountNames'), parameters('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+          "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
         }
       },
       "dependsOn": [
