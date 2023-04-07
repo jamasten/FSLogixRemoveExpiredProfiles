@@ -1,7 +1,7 @@
 param SasToken string
 param KeyVaultName string
 param Location string
-param RoleDefinitionIds object
+param RoleDefinitionId string
 param UserAssignedIdentityPrincipalId string
 @secure()
 param VmPassword string
@@ -58,10 +58,10 @@ resource secret_VmUsername 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
 
 // Gives the User Assigned Identity rights to get key vault secrets
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(UserAssignedIdentityPrincipalId, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
+  name: guid(UserAssignedIdentityPrincipalId, RoleDefinitionId, resourceGroup().id)
   scope: keyVault
   properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.KeyVaultSecretsUser)
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionId)
     principalId: UserAssignedIdentityPrincipalId
     principalType: 'ServicePrincipal'
   }

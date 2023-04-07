@@ -209,6 +209,24 @@ var UserAssignedIdentityName = 'uai-${NamingStandard}'
 var VmName = 'vm-${NamingStandard}'
 
 
+resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
+  name: guid(subscription().id, 'CaseWorkerDeploy')
+  properties: {
+    roleName: 'KeyVaultDeploy_${subscription().id}'
+    description: 'Allows a principal to get but not view Key Vault secrets for an ARM template deployment.'
+    assignableScopes: [
+      subscription().id
+    ]
+    permissions: [
+      {
+        actions: [
+          'Microsoft.KeyVault/vaults/deploy/action'
+        ]
+      }
+    ]
+  }
+}
+
 resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = {
   name: ResourceGroupName
   location: Location
@@ -276,7 +294,7 @@ module keyVault 'modules/keyVault.bicep' = {
   params: {
     KeyVaultName: KeyVaultName
     Location: Location
-    RoleDefinitionIds: RoleDefinitionIds
+    RoleDefinitionId: roleDefinition.name
     SasToken: _artifactsLocationSasToken
     UserAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
     VmPassword: VmPassword
