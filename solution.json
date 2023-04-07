@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "11991299878869921920"
+      "templateHash": "5366396473945746182"
     }
   },
   "parameters": {
@@ -86,13 +86,6 @@
       "defaultValue": "",
       "metadata": {
         "description": "The resource ID for the Log Analytics Workspace to collect log data and send alerts."
-      }
-    },
-    "RecurrenceDateTime": {
-      "type": "string",
-      "defaultValue": "2023-01-01T23:00:00",
-      "metadata": {
-        "description": "The date and time the tool should run weekly. Ideally select a time when most or all users will offline."
       }
     },
     "SubnetName": {
@@ -844,9 +837,6 @@
           "NicName": {
             "value": "[variables('NicName')]"
           },
-          "RecurrenceDateTime": {
-            "value": "[parameters('RecurrenceDateTime')]"
-          },
           "RoleAssignmentResourceGroups": {
             "value": "[variables('RoleAssignmentResourceGroups')]"
           },
@@ -897,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "1980350354546311182"
+              "templateHash": "12019206622117799655"
             }
           },
           "parameters": {
@@ -941,9 +931,6 @@
             "NicName": {
               "type": "string"
             },
-            "RecurrenceDateTime": {
-              "type": "string"
-            },
             "RoleAssignmentResourceGroups": {
               "type": "array"
             },
@@ -964,6 +951,10 @@
             },
             "TemplateSpecVersionResourceId": {
               "type": "string"
+            },
+            "Time": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
             },
             "TimeZone": {
               "type": "string"
@@ -1029,7 +1020,7 @@
               "properties": {
                 "frequency": "Day",
                 "interval": 1,
-                "startTime": "[parameters('RecurrenceDateTime')]",
+                "startTime": "[dateTimeAdd(parameters('Time'), 'PT15M')]",
                 "timeZone": "[parameters('TimeZone')]"
               },
               "dependsOn": [

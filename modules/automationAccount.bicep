@@ -12,7 +12,6 @@ param KeyVaultName string
 param Location string
 param LogAnalyticsWorkspaceResourceId string
 param NicName string
-param RecurrenceDateTime string
 param RoleAssignmentResourceGroups array
 param RoleDefinitionIds object
 param RunbookName string
@@ -20,6 +19,7 @@ param RunbookScriptName string
 param SubnetName string
 param Tags object
 param TemplateSpecVersionResourceId string
+param Time string = utcNow()
 param TimeZone string
 param UserAssignedIdentityClientId string
 param UserAssignedIdentityResourceId string
@@ -67,7 +67,7 @@ resource schedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08'
   properties: {
     frequency: 'Day'
     interval: 1
-    startTime: RecurrenceDateTime
+    startTime: dateTimeAdd(Time, 'PT15M')
     timeZone: TimeZone
   }
 }

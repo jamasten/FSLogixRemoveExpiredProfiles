@@ -44,9 +44,6 @@ param Location string = deployment().location
 @description('The resource ID for the Log Analytics Workspace to collect log data and send alerts.')
 param LogAnalyticsWorkspaceResourceId string = ''
 
-@description('The date and time the tool should run weekly. Ideally select a time when most or all users will offline.')
-param RecurrenceDateTime string = '2023-01-01T23:00:00'
-
 @description('The subnet for the AVD session hosts.')
 param SubnetName string
 
@@ -270,7 +267,6 @@ module automationAccount 'modules/automationAccount.bicep' = {
     Location: Location
     LogAnalyticsWorkspaceResourceId: LogAnalyticsWorkspaceResourceId
     NicName: NicName
-    RecurrenceDateTime: RecurrenceDateTime
     RoleAssignmentResourceGroups: RoleAssignmentResourceGroups
     RoleDefinitionIds: RoleDefinitionIds
     RunbookName: RunbookName
