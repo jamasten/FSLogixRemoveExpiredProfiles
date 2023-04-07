@@ -7,7 +7,7 @@ param Location string
 param NicName string
 param ScriptUri string
 param SubnetName string
-param Tags object
+param Tags object = {}
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 param UserAssignedIdentityClientId string
 param UserAssignedIdentityResourceId string

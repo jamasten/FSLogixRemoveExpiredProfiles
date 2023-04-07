@@ -106,7 +106,6 @@ try
 		ResourceGroupName = $ResourceGroupName
 		ScriptUri = $_artifactsLoction
 		SubnetName = $SubnetName
-		Tags = $Tags | ConvertFrom-Json
 		TemplateSpecId = $TemplateSpecId
 		UserAssignedIdentityClientId = $UserAssignedIdentityClientId
 		UserAssignedIdentityResourceId = $UserAssignedIdentityResourceId
@@ -116,7 +115,14 @@ try
 		VmSize = $VmSize
 	}
 
+	# Add conditional params
+	if(!($Tags -eq 'None'))
+	{
+		$Tags = $Tags | ConvertFrom-Json
+		$Params.Add('Tags', $Tags)
+	}
 
+	# Connect to Azure
 	Connect-AzAccount -Environment $EnvironmentName -Tenant $TenantId -Subscription $SubscriptionId -Identity | Out-Null
 	Write-Output 'Connected to Azure'
 

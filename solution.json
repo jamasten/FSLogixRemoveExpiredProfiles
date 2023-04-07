@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "5366396473945746182"
+      "templateHash": "6425691496240793989"
     }
   },
   "parameters": {
@@ -887,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "12019206622117799655"
+              "templateHash": "5971763022119021423"
             }
           },
           "parameters": {
@@ -1045,7 +1045,7 @@
                   "ResourceGroupName": "[resourceGroup().name]",
                   "SubnetName": "[parameters('SubnetName')]",
                   "SubscriptionId": "[subscription().subscriptionId]",
-                  "Tags": "[string(parameters('Tags'))]",
+                  "Tags": "[if(empty(parameters('Tags')), 'None', string(parameters('Tags')))]",
                   "TemplateSpecId": "[parameters('TemplateSpecVersionResourceId')]",
                   "TenantId": "[subscription().tenantId]",
                   "UserAssignedIdentityClientId": "[parameters('UserAssignedIdentityClientId')]",

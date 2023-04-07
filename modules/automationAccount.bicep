@@ -90,7 +90,7 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
       ResourceGroupName: resourceGroup().name
       SubnetName: SubnetName
       SubscriptionId: subscription().subscriptionId
-      Tags: string(Tags)
+      Tags: empty(Tags) ? 'None' : string(Tags)
       TemplateSpecId: TemplateSpecVersionResourceId
       TenantId: subscription().tenantId
       UserAssignedIdentityClientId: UserAssignedIdentityClientId
