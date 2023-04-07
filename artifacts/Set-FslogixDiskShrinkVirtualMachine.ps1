@@ -95,8 +95,7 @@ try
 	Import-Module -Name 'Az.Resources'
 	Write-Output 'Imported modules successfully'
 
-	$Params = @{
-		_artifactsLocation = $_artifactsLoction
+	$Params = @{		
 		DeleteOlderThanDays = $DeleteOlderThanDays.ToInt32()
 		DiskName = $DiskName
 		FileShareResourceIds = $FileShareResourceIds | ConvertFrom-Json
@@ -105,6 +104,7 @@ try
 		Location = $Location
 		NicName = $NicName
 		ResourceGroupName = $ResourceGroupName
+		ScriptUri = $_artifactsLoction
 		SubnetName = $SubnetName
 		Tags = $Tags | ConvertFrom-Json
 		TemplateSpecId = $TemplateSpecId
@@ -119,18 +119,6 @@ try
 
 	Connect-AzAccount -Environment $EnvironmentName -Tenant $TenantId -Subscription $SubscriptionId -Identity | Out-Null
 	Write-Output 'Connected to Azure'
-
-	# Get secure strings from Key Vault and add the values using the Add method for proper deserialization
-	$SasToken = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'SasToken').SecretValue
-	if($SasToken)
-	{
-		$Params.Add('_artifactsLocationSasToken', $SasToken)
-	}
-	$VmPassword = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'VmPassword').SecretValue
-	$Params.Add('VmPassword', $VmPassword)
-	$VmUsername = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name 'VmUsername').SecretValue
-	$Params.Add('VmUsername', $VmUsername)
-	Write-Output 'Acquired Key Vault secrets'
 
 	# Deploy the virtual machine & run the tool
 	New-AzResourceGroupDeployment @Params

@@ -127,13 +127,14 @@ resource diagnostics 'Microsoft.Insights/diagnosticsettings@2017-05-01-preview' 
   }
 }
 
-// Gives the Managed Identity for the Automation Account rights to deploy the VM to shrink FSLogix disks
+// Gives the Managed Identity for the Automation Account rights to deploy the VM to remove expired FSLogix disks
 @batchSize(1)
 module roleAssignments_VirtualMachineContributor 'roleAssignments.bicep' = [for i in range(0, length(RoleAssignmentResourceGroups)): {
   name: 'RoleAssignment_${RoleAssignmentResourceGroups[i]}'
   scope: resourceGroup(RoleAssignmentResourceGroups[i])
   params: {
-    AutomationAccountId: automationAccount.identity.principalId
+    PrincipalId: automationAccount.identity.principalId
+    RoleDefinitionId: RoleDefinitionIds.VirtualMachineContributor
   }
 }]
 
@@ -156,6 +157,3 @@ resource roleAssignment_ManagedIdentityOperator 'Microsoft.Authorization/roleAss
     principalType: 'ServicePrincipal'
   }
 }
-
-output PrincipalId string = automationAccount.identity.principalId
-output ResourceId string = automationAccount.id

@@ -9,8 +9,8 @@ Param(
     $Environment,
 
     [parameter(Mandatory)]
-    [string]
-    $FileShareNames,
+    [array]
+    $FileShareResourceIds,
 
     [parameter(Mandatory)]
     [string]

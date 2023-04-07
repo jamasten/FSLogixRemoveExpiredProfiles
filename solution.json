@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "13007381559439556532"
+      "templateHash": "11411809984877383415"
     }
   },
   "parameters": {
@@ -216,7 +216,8 @@
     "RoleDefinitionIds": {
       "KeyVaultSecretsUser": "4633458b-17de-408a-b874-0445c86b69e6",
       "ManagedIdentityOperator": "f1a07417-d97a-45cb-824c-7a7467783830",
-      "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+      "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+      "VirtualMachineContributor": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
     },
     "RunbookName": "FslogixDiskShrink",
     "RunbookScriptName": "Set-FslogixDiskShrinkVirtualMachine.ps1",
@@ -725,7 +726,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "3850235555727776276"
+              "templateHash": "1980350354546311182"
             }
           },
           "parameters": {
@@ -971,8 +972,11 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                  "AutomationAccountId": {
+                  "PrincipalId": {
                     "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
+                  },
+                  "RoleDefinitionId": {
+                    "value": "[parameters('RoleDefinitionIds').VirtualMachineContributor]"
                   }
                 },
                 "template": {
@@ -982,25 +986,25 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.16.1.55165",
-                      "templateHash": "2385782021182848203"
+                      "templateHash": "9766569436966301097"
                     }
                   },
                   "parameters": {
-                    "AutomationAccountId": {
+                    "PrincipalId": {
+                      "type": "string"
+                    },
+                    "RoleDefinitionId": {
                       "type": "string"
                     }
-                  },
-                  "variables": {
-                    "RoleDefinitionId": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
                   },
                   "resources": [
                     {
                       "type": "Microsoft.Authorization/roleAssignments",
                       "apiVersion": "2020-10-01-preview",
-                      "name": "[guid(parameters('AutomationAccountId'), variables('RoleDefinitionId'), resourceGroup().id)]",
+                      "name": "[guid(parameters('PrincipalId'), parameters('RoleDefinitionId'), resourceGroup().id)]",
                       "properties": {
-                        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionId'))]",
-                        "principalId": "[parameters('AutomationAccountId')]",
+                        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
+                        "principalId": "[parameters('PrincipalId')]",
                         "principalType": "ServicePrincipal"
                       }
                     }
@@ -1011,17 +1015,7 @@
                 "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
               ]
             }
-          ],
-          "outputs": {
-            "PrincipalId": {
-              "type": "string",
-              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
-            },
-            "ResourceId": {
-              "type": "string",
-              "value": "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
-            }
-          }
+          ]
         }
       },
       "dependsOn": [
@@ -1041,12 +1035,6 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "AutomationAccountPrincipalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
-          },
-          "AutomationAccountResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
-          },
           "KeyVaultName": {
             "value": "[variables('KeyVaultName')]"
           },
@@ -1062,9 +1050,6 @@
           "UserAssignedIdentityPrincipalId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
-          "UserAssignedIdentityResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
-          },
           "VmPassword": {
             "value": "[parameters('VmPassword')]"
           },
@@ -1079,17 +1064,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "2855029593225832550"
+              "templateHash": "5846236685999201967"
             }
           },
           "parameters": {
             "SasToken": {
-              "type": "string"
-            },
-            "AutomationAccountPrincipalId": {
-              "type": "string"
-            },
-            "AutomationAccountResourceId": {
               "type": "string"
             },
             "KeyVaultName": {
@@ -1102,9 +1081,6 @@
               "type": "object"
             },
             "UserAssignedIdentityPrincipalId": {
-              "type": "string"
-            },
-            "UserAssignedIdentityResourceId": {
               "type": "string"
             },
             "VmPassword": {
@@ -1172,24 +1148,10 @@
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-10-01-preview",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('KeyVaultName'))]",
-              "name": "[guid(parameters('UserAssignedIdentityResourceId'), parameters('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
+              "name": "[guid(parameters('UserAssignedIdentityPrincipalId'), parameters('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').KeyVaultSecretsUser)]",
                 "principalId": "[parameters('UserAssignedIdentityPrincipalId')]",
-                "principalType": "ServicePrincipal"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2020-10-01-preview",
-              "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('KeyVaultName'))]",
-              "name": "[guid(parameters('AutomationAccountResourceId'), parameters('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
-              "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').KeyVaultSecretsUser)]",
-                "principalId": "[parameters('AutomationAccountPrincipalId')]",
                 "principalType": "ServicePrincipal"
               },
               "dependsOn": [
@@ -1200,7 +1162,6 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp')))]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
       ]

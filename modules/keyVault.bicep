@@ -1,16 +1,12 @@
 param SasToken string
-param AutomationAccountPrincipalId string
-param AutomationAccountResourceId string
 param KeyVaultName string
 param Location string
 param RoleDefinitionIds object
 param UserAssignedIdentityPrincipalId string
-param UserAssignedIdentityResourceId string
 @secure()
 param VmPassword string
 @secure()
 param VmUsername string
-
 
 
 // The Key Vault stores the secrets to deploy virtual machine and mount the SMB share(s)
@@ -60,26 +56,13 @@ resource secret_VmUsername 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
   }
 }
 
-
-
 // Gives the User Assigned Identity rights to get key vault secrets
-resource roleAssignment_KeyVaultSecretsUser02 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(UserAssignedIdentityResourceId, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(UserAssignedIdentityPrincipalId, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
   scope: keyVault
   properties: {
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.KeyVaultSecretsUser)
     principalId: UserAssignedIdentityPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// Gives the Managed Identity for the Automation Account rights to get key vault secrects
-resource roleAssignment_KeyVaultSecretsUser01 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(AutomationAccountResourceId, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.KeyVaultSecretsUser)
-    principalId: AutomationAccountPrincipalId
     principalType: 'ServicePrincipal'
   }
 }

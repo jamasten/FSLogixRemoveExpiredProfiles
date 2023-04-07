@@ -5,17 +5,10 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "9341956204983815761"
+      "templateHash": "14072102559646155909"
     }
   },
   "parameters": {
-    "_artifactsLocation": {
-      "type": "string"
-    },
-    "_artifactsLocationSasToken": {
-      "type": "securestring",
-      "defaultValue": ""
-    },
     "DeleteOlderThanDays": {
       "type": "int"
     },
@@ -35,6 +28,9 @@
       "type": "string"
     },
     "NicName": {
+      "type": "string"
+    },
+    "ScriptUri": {
       "type": "string"
     },
     "SubnetName": {
@@ -62,135 +58,292 @@
     "VmName": {
       "type": "string"
     },
-    "VmPassword": {
-      "type": "securestring"
-    },
     "VmSize": {
       "type": "string"
-    },
-    "VmUsername": {
-      "type": "securestring"
     }
-  },
-  "variables": {
-    "StorageAccountSuffix": "[environment().suffixes.storage]"
   },
   "resources": [
     {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2020-05-01",
-      "name": "[parameters('NicName')]",
-      "location": "[parameters('Location')]",
-      "tags": "[parameters('Tags')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('VirtualMachine_{0}', parameters('Timestamp'))]",
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[resourceId(parameters('VirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('SubnetName'))]"
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "SasToken": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
               },
-              "primary": true,
-              "privateIPAddressVersion": "IPv4"
+              "secretName": "SasToken"
+            }
+          },
+          "DeleteOlderThanDays": {
+            "value": "[parameters('DeleteOlderThanDays')]"
+          },
+          "DiskName": {
+            "value": "[parameters('DiskName')]"
+          },
+          "FileShareResourceIds": {
+            "value": "[parameters('FileShareResourceIds')]"
+          },
+          "HybridUseBenefit": {
+            "value": "[parameters('HybridUseBenefit')]"
+          },
+          "KeyVaultName": {
+            "value": "[parameters('KeyVaultName')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "NicName": {
+            "value": "[parameters('NicName')]"
+          },
+          "ScriptUri": {
+            "value": "[parameters('ScriptUri')]"
+          },
+          "SubnetName": {
+            "value": "[parameters('SubnetName')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "Timestamp": {
+            "value": "[parameters('Timestamp')]"
+          },
+          "UserAssignedIdentityClientId": {
+            "value": "[parameters('UserAssignedIdentityClientId')]"
+          },
+          "UserAssignedIdentityResourceId": {
+            "value": "[parameters('UserAssignedIdentityResourceId')]"
+          },
+          "VirtualNetworkName": {
+            "value": "[parameters('VirtualNetworkName')]"
+          },
+          "VirtualNetworkResourceGroupName": {
+            "value": "[parameters('VirtualNetworkResourceGroupName')]"
+          },
+          "VmName": {
+            "value": "[parameters('VmName')]"
+          },
+          "VmPassword": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              },
+              "secretName": "VmPassword"
+            }
+          },
+          "VmSize": {
+            "value": "[parameters('VmSize')]"
+          },
+          "VmUsername": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              },
+              "secretName": "VmUsername"
             }
           }
-        ],
-        "enableAcceleratedNetworking": true,
-        "enableIPForwarding": false
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2021-11-01",
-      "name": "[parameters('VmName')]",
-      "location": "[parameters('Location')]",
-      "tags": "[parameters('Tags')]",
-      "identity": {
-        "type": "UserAssigned",
-        "userAssignedIdentities": {
-          "[format('{0}', parameters('UserAssignedIdentityResourceId'))]": {}
-        }
-      },
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "[parameters('VmSize')]"
         },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "MicrosoftWindowsServer",
-            "offer": "WindowsServer",
-            "sku": "2019-Datacenter",
-            "version": "latest"
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.16.1.55165",
+              "templateHash": "4096362347607764829"
+            }
           },
-          "osDisk": {
-            "deleteOption": "Delete",
-            "osType": "Windows",
-            "createOption": "FromImage",
-            "caching": "ReadWrite",
-            "managedDisk": {
-              "storageAccountType": "Premium_LRS"
+          "parameters": {
+            "DeleteOlderThanDays": {
+              "type": "int"
             },
-            "name": "[parameters('DiskName')]"
+            "DiskName": {
+              "type": "string"
+            },
+            "FileShareResourceIds": {
+              "type": "array"
+            },
+            "HybridUseBenefit": {
+              "type": "bool"
+            },
+            "KeyVaultName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "NicName": {
+              "type": "string"
+            },
+            "SasToken": {
+              "type": "securestring"
+            },
+            "ScriptUri": {
+              "type": "string"
+            },
+            "SubnetName": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "Timestamp": {
+              "type": "string"
+            },
+            "UserAssignedIdentityClientId": {
+              "type": "string"
+            },
+            "UserAssignedIdentityResourceId": {
+              "type": "string"
+            },
+            "VirtualNetworkName": {
+              "type": "string"
+            },
+            "VirtualNetworkResourceGroupName": {
+              "type": "string"
+            },
+            "VmName": {
+              "type": "string"
+            },
+            "VmPassword": {
+              "type": "securestring"
+            },
+            "VmSize": {
+              "type": "string"
+            },
+            "VmUsername": {
+              "type": "securestring"
+            }
           },
-          "dataDisks": []
-        },
-        "osProfile": {
-          "computerName": "[parameters('VmName')]",
-          "adminUsername": "[parameters('VmUsername')]",
-          "adminPassword": "[parameters('VmPassword')]",
-          "windowsConfiguration": {
-            "provisionVMAgent": true,
-            "enableAutomaticUpdates": false
+          "variables": {
+            "StorageAccountSuffix": "[environment().suffixes.storage]"
           },
-          "secrets": [],
-          "allowExtensionOperations": true
-        },
-        "networkProfile": {
-          "networkInterfaces": [
+          "resources": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]",
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2020-05-01",
+              "name": "[parameters('NicName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
               "properties": {
-                "deleteOption": "Delete"
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[resourceId(parameters('VirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('SubnetName'))]"
+                      },
+                      "primary": true,
+                      "privateIPAddressVersion": "IPv4"
+                    }
+                  }
+                ],
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": false
               }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2021-11-01",
+              "name": "[parameters('VmName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('UserAssignedIdentityResourceId'))]": {}
+                }
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('VmSize')]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "2019-Datacenter",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "deleteOption": "Delete",
+                    "osType": "Windows",
+                    "createOption": "FromImage",
+                    "caching": "ReadWrite",
+                    "managedDisk": {
+                      "storageAccountType": "Premium_LRS"
+                    },
+                    "name": "[parameters('DiskName')]"
+                  },
+                  "dataDisks": []
+                },
+                "osProfile": {
+                  "computerName": "[parameters('VmName')]",
+                  "adminUsername": "[parameters('VmUsername')]",
+                  "adminPassword": "[parameters('VmPassword')]",
+                  "windowsConfiguration": {
+                    "provisionVMAgent": true,
+                    "enableAutomaticUpdates": false
+                  },
+                  "secrets": [],
+                  "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                },
+                "licenseType": "[if(parameters('HybridUseBenefit'), 'Windows_Server', null())]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2021-03-01",
+              "name": "[format('{0}/{1}', parameters('VmName'), 'CustomScriptExtension')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": [
+                    "[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
+                  ],
+                  "timestamp": "[parameters('Timestamp')]"
+                },
+                "protectedSettings": {
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VmName'))]"
+              ]
             }
           ]
-        },
-        "diagnosticsProfile": {
-          "bootDiagnostics": {
-            "enabled": false
-          }
-        },
-        "licenseType": "[if(parameters('HybridUseBenefit'), 'Windows_Server', null())]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "2021-03-01",
-      "name": "[format('{0}/{1}', parameters('VmName'), 'CustomScriptExtension')]",
-      "location": "[parameters('Location')]",
-      "tags": "[parameters('Tags')]",
-      "properties": {
-        "publisher": "Microsoft.Compute",
-        "type": "CustomScriptExtension",
-        "typeHandlerVersion": "1.10",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": [
-            "[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
-          ],
-          "timestamp": "[parameters('Timestamp')]"
-        },
-        "protectedSettings": {
-          "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
         }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Compute/virtualMachines', parameters('VmName'))]"
-      ]
+      }
     }
   ]
 }

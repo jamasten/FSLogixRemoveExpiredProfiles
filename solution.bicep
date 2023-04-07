@@ -142,6 +142,7 @@ var RoleDefinitionIds = {
   KeyVaultSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
   ManagedIdentityOperator: 'f1a07417-d97a-45cb-824c-7a7467783830'
   Reader: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+  VirtualMachineContributor: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
 }
 var RunbookName = 'FslogixDiskShrink'
 var RunbookScriptName = 'Set-FslogixDiskShrinkVirtualMachine.ps1'
@@ -273,14 +274,11 @@ module keyVault 'modules/keyVault.bicep' = {
   scope: rg
   name: 'KeyVault_${Timestamp}'
   params: {
-    AutomationAccountPrincipalId: automationAccount.outputs.PrincipalId
-    AutomationAccountResourceId: automationAccount.outputs.ResourceId
     KeyVaultName: KeyVaultName
     Location: Location
     RoleDefinitionIds: RoleDefinitionIds
     SasToken: _artifactsLocationSasToken
     UserAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
-    UserAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
     VmPassword: VmPassword
     VmUsername: VmUsername
   }
