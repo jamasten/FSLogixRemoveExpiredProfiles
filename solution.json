@@ -1,11 +1,11 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "12289724244373485022"
+      "templateHash": "13007381559439556532"
     }
   },
   "parameters": {
@@ -74,16 +74,9 @@
       },
       "maxLength": 3
     },
-    "JobScheduleName": {
-      "type": "string",
-      "defaultValue": "[newGuid()]",
-      "metadata": {
-        "description": "DO NOT MODIFY THIS VALUE! The name of the Job Schedule must be set as a unique GUID during each deployment."
-      }
-    },
     "Location": {
       "type": "string",
-      "defaultValue": "[resourceGroup().location]",
+      "defaultValue": "[deployment().location]",
       "metadata": {
         "description": "The deployment location for the solution."
       }
@@ -114,6 +107,13 @@
       "defaultValue": {},
       "metadata": {
         "description": "Add key / value pairs to include metadata on the Azure resources."
+      }
+    },
+    "Timestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow('yyyyMMddhhmmss')]",
+      "metadata": {
+        "description": "DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter."
       }
     },
     "VirtualNetworkName": {
@@ -149,202 +149,6 @@
     }
   },
   "variables": {
-    "$fxv#0": {
-      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-      "contentVersion": "1.0.0.0",
-      "metadata": {
-        "_generator": {
-          "name": "bicep",
-          "version": "0.16.1.55165",
-          "templateHash": "9341956204983815761"
-        }
-      },
-      "parameters": {
-        "_artifactsLocation": {
-          "type": "string"
-        },
-        "_artifactsLocationSasToken": {
-          "type": "securestring",
-          "defaultValue": ""
-        },
-        "DeleteOlderThanDays": {
-          "type": "int"
-        },
-        "DiskName": {
-          "type": "string"
-        },
-        "FileShareResourceIds": {
-          "type": "array"
-        },
-        "HybridUseBenefit": {
-          "type": "bool"
-        },
-        "KeyVaultName": {
-          "type": "string"
-        },
-        "Location": {
-          "type": "string"
-        },
-        "NicName": {
-          "type": "string"
-        },
-        "SubnetName": {
-          "type": "string"
-        },
-        "Tags": {
-          "type": "object"
-        },
-        "Timestamp": {
-          "type": "string",
-          "defaultValue": "[[utcNow('yyyyMMddhhmmss')]"
-        },
-        "UserAssignedIdentityClientId": {
-          "type": "string"
-        },
-        "UserAssignedIdentityResourceId": {
-          "type": "string"
-        },
-        "VirtualNetworkName": {
-          "type": "string"
-        },
-        "VirtualNetworkResourceGroupName": {
-          "type": "string"
-        },
-        "VmName": {
-          "type": "string"
-        },
-        "VmPassword": {
-          "type": "securestring"
-        },
-        "VmSize": {
-          "type": "string"
-        },
-        "VmUsername": {
-          "type": "securestring"
-        }
-      },
-      "variables": {
-        "StorageAccountSuffix": "[[environment().suffixes.storage]"
-      },
-      "resources": [
-        {
-          "type": "Microsoft.Network/networkInterfaces",
-          "apiVersion": "2020-05-01",
-          "name": "[[parameters('NicName')]",
-          "location": "[[parameters('Location')]",
-          "tags": "[[parameters('Tags')]",
-          "properties": {
-            "ipConfigurations": [
-              {
-                "name": "ipconfig",
-                "properties": {
-                  "privateIPAllocationMethod": "Dynamic",
-                  "subnet": {
-                    "id": "[[resourceId(parameters('VirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('SubnetName'))]"
-                  },
-                  "primary": true,
-                  "privateIPAddressVersion": "IPv4"
-                }
-              }
-            ],
-            "enableAcceleratedNetworking": true,
-            "enableIPForwarding": false
-          }
-        },
-        {
-          "type": "Microsoft.Compute/virtualMachines",
-          "apiVersion": "2021-11-01",
-          "name": "[[parameters('VmName')]",
-          "location": "[[parameters('Location')]",
-          "tags": "[[parameters('Tags')]",
-          "identity": {
-            "type": "UserAssigned",
-            "userAssignedIdentities": {
-              "[[format('{0}', parameters('UserAssignedIdentityResourceId'))]": {}
-            }
-          },
-          "properties": {
-            "hardwareProfile": {
-              "vmSize": "[[parameters('VmSize')]"
-            },
-            "storageProfile": {
-              "imageReference": {
-                "publisher": "MicrosoftWindowsServer",
-                "offer": "WindowsServer",
-                "sku": "2019-Datacenter",
-                "version": "latest"
-              },
-              "osDisk": {
-                "deleteOption": "Delete",
-                "osType": "Windows",
-                "createOption": "FromImage",
-                "caching": "ReadWrite",
-                "managedDisk": {
-                  "storageAccountType": "Premium_LRS"
-                },
-                "name": "[[parameters('DiskName')]"
-              },
-              "dataDisks": []
-            },
-            "osProfile": {
-              "computerName": "[[parameters('VmName')]",
-              "adminUsername": "[[parameters('VmUsername')]",
-              "adminPassword": "[[parameters('VmPassword')]",
-              "windowsConfiguration": {
-                "provisionVMAgent": true,
-                "enableAutomaticUpdates": false
-              },
-              "secrets": [],
-              "allowExtensionOperations": true
-            },
-            "networkProfile": {
-              "networkInterfaces": [
-                {
-                  "id": "[[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]",
-                  "properties": {
-                    "deleteOption": "Delete"
-                  }
-                }
-              ]
-            },
-            "diagnosticsProfile": {
-              "bootDiagnostics": {
-                "enabled": false
-              }
-            },
-            "licenseType": "[[if(parameters('HybridUseBenefit'), 'Windows_Server', null())]"
-          },
-          "dependsOn": [
-            "[[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]"
-          ]
-        },
-        {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "apiVersion": "2021-03-01",
-          "name": "[[format('{0}/{1}', parameters('VmName'), 'CustomScriptExtension')]",
-          "location": "[[parameters('Location')]",
-          "tags": "[[parameters('Tags')]",
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.10",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "[[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
-              ],
-              "timestamp": "[[parameters('Timestamp')]"
-            },
-            "protectedSettings": {
-              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
-            }
-          },
-          "dependsOn": [
-            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VmName'))]"
-          ]
-        }
-      ]
-    },
     "AutomationAccountName": "[format('aa-{0}', variables('NamingStandard'))]",
     "DiskName": "[format('disk-{0}', variables('NamingStandard'))]",
     "KeyVaultName": "[format('kv-{0}', variables('NamingStandard'))]",
@@ -404,8 +208,9 @@
     },
     "NamingStandard": "[format('{0}-{1}-{2}-fslogix', parameters('Identifier'), parameters('Environment'), variables('LocationShortName'))]",
     "NicName": "[format('nic-{0}', variables('NamingStandard'))]",
+    "ResourceGroupName": "[format('rg-{0}', variables('NamingStandard'))]",
     "RoleAssignmentResourceGroups": [
-      "[resourceGroup().name]",
+      "[variables('ResourceGroupName')]",
       "[parameters('VirtualNetworkResourceGroupName')]"
     ],
     "RoleDefinitionIds": {
@@ -479,276 +284,29 @@
   },
   "resources": [
     {
-      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "apiVersion": "2018-11-30",
-      "name": "[variables('UserAssignedIdentityName')]",
-      "location": "[parameters('Location')]"
-    },
-    {
-      "type": "Microsoft.Resources/templateSpecs",
-      "apiVersion": "2021-05-01",
-      "name": "[variables('TemplateSpecName')]",
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2019-10-01",
+      "name": "[variables('ResourceGroupName')]",
       "location": "[parameters('Location')]",
-      "properties": {
-        "description": "Deploys a virtual machine to run the \"FSLogix Disk Shrink\" tool against an SMB share containing FSLogix profile containers.",
-        "displayName": "FSLogix Disk Shrink solution"
-      }
+      "tags": "[parameters('Tags')]",
+      "properties": {}
     },
     {
-      "type": "Microsoft.Resources/templateSpecs/versions",
-      "apiVersion": "2021-05-01",
-      "name": "[format('{0}/{1}', variables('TemplateSpecName'), '1.0')]",
-      "location": "[parameters('Location')]",
-      "properties": {
-        "mainTemplate": "[variables('$fxv#0')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/templateSpecs', variables('TemplateSpecName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2021-06-22",
-      "name": "[variables('AutomationAccountName')]",
-      "location": "[parameters('Location')]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "properties": {
-        "sku": {
-          "name": "Free"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts/runbooks",
-      "apiVersion": "2019-06-01",
-      "name": "[format('{0}/{1}', variables('AutomationAccountName'), variables('RunbookName'))]",
-      "location": "[parameters('Location')]",
-      "properties": {
-        "description": "FSLogix Disk Shrink Automation",
-        "runbookType": "PowerShell",
-        "logProgress": false,
-        "logVerbose": false,
-        "logActivityTrace": 0,
-        "publishContentLink": {
-          "uri": "[format('{0}{1}{2}', parameters('_artifactsLocation'), variables('RunbookScriptName'), parameters('_artifactsLocationSasToken'))]",
-          "version": "1.0.0.0"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-10-01-preview",
-      "name": "[guid(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), variables('RoleDefinitionIds').Reader, resourceGroup().id)]",
-      "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionIds').Reader)]",
-        "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-10-01-preview",
-      "name": "[guid(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), variables('RoleDefinitionIds').ManagedIdentityOperator, resourceGroup().id)]",
-      "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionIds').ManagedIdentityOperator)]",
-        "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2021-10-01",
-      "name": "[variables('KeyVaultName')]",
-      "location": "[parameters('Location')]",
-      "properties": {
-        "tenantId": "[subscription().tenantId]",
-        "sku": {
-          "family": "A",
-          "name": "standard"
-        },
-        "enabledForDeployment": true,
-        "enabledForTemplateDeployment": true,
-        "enabledForDiskEncryption": false,
-        "enableRbacAuthorization": true,
-        "enableSoftDelete": false,
-        "publicNetworkAccess": "Enabled"
-      }
-    },
-    {
-      "condition": "[not(empty(parameters('_artifactsLocationSasToken')))]",
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2021-10-01",
-      "name": "[format('{0}/{1}', variables('KeyVaultName'), 'SasToken')]",
-      "properties": {
-        "value": "[parameters('_artifactsLocationSasToken')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2021-10-01",
-      "name": "[format('{0}/{1}', variables('KeyVaultName'), 'VmPassword')]",
-      "properties": {
-        "value": "[parameters('VmPassword')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults/secrets",
-      "apiVersion": "2021-10-01",
-      "name": "[format('{0}/{1}', variables('KeyVaultName'), 'VmUsername')]",
-      "properties": {
-        "value": "[parameters('VmUsername')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-10-01-preview",
-      "scope": "[format('Microsoft.KeyVault/vaults/{0}', variables('KeyVaultName'))]",
-      "name": "[guid(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), variables('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
-      "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionIds').KeyVaultSecretsUser)]",
-        "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-10-01-preview",
-      "scope": "[format('Microsoft.KeyVault/vaults/{0}', variables('KeyVaultName'))]",
-      "name": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName')), variables('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
-      "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionIds').KeyVaultSecretsUser)]",
-        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName')), '2018-11-30').principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts/schedules",
-      "apiVersion": "2022-08-08",
-      "name": "[format('{0}/{1}', variables('AutomationAccountName'), format('{0}_{1}', variables('RunbookName'), parameters('Frequency')))]",
-      "properties": {
-        "frequency": "Day",
-        "interval": 1,
-        "startTime": "[parameters('RecurrenceDateTime')]",
-        "timeZone": "[variables('TimeZone')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Automation/automationAccounts/jobSchedules",
-      "apiVersion": "2022-08-08",
-      "name": "[format('{0}/{1}', variables('AutomationAccountName'), parameters('JobScheduleName'))]",
-      "properties": {
-        "parameters": {
-          "_artifactsLoction": "[parameters('_artifactsLocation')]",
-          "DeleteOlderThanDays": "[string(parameters('DeleteOlderThanDays'))]",
-          "DiskName": "[variables('DiskName')]",
-          "EnvironmentName": "[environment().name]",
-          "FileShareResourceIds": "[string(parameters('FileShareResourceIds'))]",
-          "HybridUseBenefit": "[string(parameters('HybridUseBenefit'))]",
-          "KeyVaultName": "[variables('KeyVaultName')]",
-          "Location": "[parameters('Location')]",
-          "NicName": "[variables('NicName')]",
-          "ResourceGroupName": "[resourceGroup().name]",
-          "SubnetName": "[parameters('SubnetName')]",
-          "SubscriptionId": "[subscription().subscriptionId]",
-          "Tags": "[string(parameters('Tags'))]",
-          "TemplateSpecId": "[resourceId('Microsoft.Resources/templateSpecs/versions', variables('TemplateSpecName'), '1.0')]",
-          "TenantId": "[subscription().tenantId]",
-          "UserAssignedIdentityClientId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName')), '2018-11-30').clientId]",
-          "UserAssignedIdentityResourceId": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName'))]",
-          "VirtualNetworkName": "[parameters('VirtualNetworkName')]",
-          "VirtualNetworkResourceGroupName": "[parameters('VirtualNetworkResourceGroupName')]",
-          "VmName": "[variables('VmName')]",
-          "VmSize": "[parameters('VmSize')]"
-        },
-        "runbook": {
-          "name": "[variables('RunbookName')]"
-        },
-        "schedule": {
-          "name": "[format('{0}_{1}', variables('RunbookName'), parameters('Frequency'))]"
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', variables('KeyVaultName'))]",
-        "[resourceId('Microsoft.Automation/automationAccounts/runbooks', variables('AutomationAccountName'), variables('RunbookName'))]",
-        "[resourceId('Microsoft.Automation/automationAccounts/schedules', variables('AutomationAccountName'), format('{0}_{1}', variables('RunbookName'), parameters('Frequency')))]",
-        "[resourceId('Microsoft.Resources/templateSpecs/versions', variables('TemplateSpecName'), '1.0')]",
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('UserAssignedIdentityName'))]"
-      ]
-    },
-    {
-      "condition": "[not(empty(parameters('LogAnalyticsWorkspaceResourceId')))]",
-      "type": "Microsoft.Insights/diagnosticSettings",
-      "apiVersion": "2017-05-01-preview",
-      "scope": "[format('Microsoft.Automation/automationAccounts/{0}', variables('AutomationAccountName'))]",
-      "name": "[format('diag-{0}', variables('AutomationAccountName'))]",
-      "properties": {
-        "logs": [
-          {
-            "category": "JobLogs",
-            "enabled": true
-          },
-          {
-            "category": "JobStreams",
-            "enabled": true
-          }
-        ],
-        "workspaceId": "[parameters('LogAnalyticsWorkspaceResourceId')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
-      ]
-    },
-    {
-      "copy": {
-        "name": "roleAssignments_VirtualMachineContributor",
-        "count": "[length(range(0, length(variables('RoleAssignmentResourceGroups'))))]",
-        "mode": "serial",
-        "batchSize": 1
-      },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('RoleAssignment_{0}', variables('RoleAssignmentResourceGroups')[range(0, length(variables('RoleAssignmentResourceGroups')))[copyIndex()]])]",
-      "resourceGroup": "[variables('RoleAssignmentResourceGroups')[range(0, length(variables('RoleAssignmentResourceGroups')))[copyIndex()]]]",
+      "name": "[format('UserAssignedIdentityName_{0}', parameters('Timestamp'))]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "AutomationAccountId": {
-            "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "UserAssignedIdentityName": {
+            "value": "[variables('UserAssignedIdentityName')]"
           }
         },
         "template": {
@@ -758,33 +316,893 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "2385782021182848203"
+              "templateHash": "4789894668860949867"
             }
           },
           "parameters": {
-            "AutomationAccountId": {
+            "Location": {
+              "type": "string"
+            },
+            "UserAssignedIdentityName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2018-11-30",
+              "name": "[parameters('UserAssignedIdentityName')]",
+              "location": "[parameters('Location')]"
+            }
+          ],
+          "outputs": {
+            "ClientId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserAssignedIdentityName')), '2018-11-30').clientId]"
+            },
+            "PrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserAssignedIdentityName')), '2018-11-30').principalId]"
+            },
+            "ResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserAssignedIdentityName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('TemplateSpec_{0}', parameters('Timestamp'))]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "TemplateSpecName": {
+            "value": "[variables('TemplateSpecName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.16.1.55165",
+              "templateHash": "16773709639275272420"
+            }
+          },
+          "parameters": {
+            "Location": {
+              "type": "string"
+            },
+            "TemplateSpecName": {
               "type": "string"
             }
           },
           "variables": {
-            "RoleDefinitionId": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
+            "$fxv#0": {
+              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+              "contentVersion": "1.0.0.0",
+              "metadata": {
+                "_generator": {
+                  "name": "bicep",
+                  "version": "0.16.1.55165",
+                  "templateHash": "9341956204983815761"
+                }
+              },
+              "parameters": {
+                "_artifactsLocation": {
+                  "type": "string"
+                },
+                "_artifactsLocationSasToken": {
+                  "type": "securestring",
+                  "defaultValue": ""
+                },
+                "DeleteOlderThanDays": {
+                  "type": "int"
+                },
+                "DiskName": {
+                  "type": "string"
+                },
+                "FileShareResourceIds": {
+                  "type": "array"
+                },
+                "HybridUseBenefit": {
+                  "type": "bool"
+                },
+                "KeyVaultName": {
+                  "type": "string"
+                },
+                "Location": {
+                  "type": "string"
+                },
+                "NicName": {
+                  "type": "string"
+                },
+                "SubnetName": {
+                  "type": "string"
+                },
+                "Tags": {
+                  "type": "object"
+                },
+                "Timestamp": {
+                  "type": "string",
+                  "defaultValue": "[[utcNow('yyyyMMddhhmmss')]"
+                },
+                "UserAssignedIdentityClientId": {
+                  "type": "string"
+                },
+                "UserAssignedIdentityResourceId": {
+                  "type": "string"
+                },
+                "VirtualNetworkName": {
+                  "type": "string"
+                },
+                "VirtualNetworkResourceGroupName": {
+                  "type": "string"
+                },
+                "VmName": {
+                  "type": "string"
+                },
+                "VmPassword": {
+                  "type": "securestring"
+                },
+                "VmSize": {
+                  "type": "string"
+                },
+                "VmUsername": {
+                  "type": "securestring"
+                }
+              },
+              "variables": {
+                "StorageAccountSuffix": "[[environment().suffixes.storage]"
+              },
+              "resources": [
+                {
+                  "type": "Microsoft.Network/networkInterfaces",
+                  "apiVersion": "2020-05-01",
+                  "name": "[[parameters('NicName')]",
+                  "location": "[[parameters('Location')]",
+                  "tags": "[[parameters('Tags')]",
+                  "properties": {
+                    "ipConfigurations": [
+                      {
+                        "name": "ipconfig",
+                        "properties": {
+                          "privateIPAllocationMethod": "Dynamic",
+                          "subnet": {
+                            "id": "[[resourceId(parameters('VirtualNetworkResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetworkName'), parameters('SubnetName'))]"
+                          },
+                          "primary": true,
+                          "privateIPAddressVersion": "IPv4"
+                        }
+                      }
+                    ],
+                    "enableAcceleratedNetworking": true,
+                    "enableIPForwarding": false
+                  }
+                },
+                {
+                  "type": "Microsoft.Compute/virtualMachines",
+                  "apiVersion": "2021-11-01",
+                  "name": "[[parameters('VmName')]",
+                  "location": "[[parameters('Location')]",
+                  "tags": "[[parameters('Tags')]",
+                  "identity": {
+                    "type": "UserAssigned",
+                    "userAssignedIdentities": {
+                      "[[format('{0}', parameters('UserAssignedIdentityResourceId'))]": {}
+                    }
+                  },
+                  "properties": {
+                    "hardwareProfile": {
+                      "vmSize": "[[parameters('VmSize')]"
+                    },
+                    "storageProfile": {
+                      "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                      },
+                      "osDisk": {
+                        "deleteOption": "Delete",
+                        "osType": "Windows",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                          "storageAccountType": "Premium_LRS"
+                        },
+                        "name": "[[parameters('DiskName')]"
+                      },
+                      "dataDisks": []
+                    },
+                    "osProfile": {
+                      "computerName": "[[parameters('VmName')]",
+                      "adminUsername": "[[parameters('VmUsername')]",
+                      "adminPassword": "[[parameters('VmPassword')]",
+                      "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": false
+                      },
+                      "secrets": [],
+                      "allowExtensionOperations": true
+                    },
+                    "networkProfile": {
+                      "networkInterfaces": [
+                        {
+                          "id": "[[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]",
+                          "properties": {
+                            "deleteOption": "Delete"
+                          }
+                        }
+                      ]
+                    },
+                    "diagnosticsProfile": {
+                      "bootDiagnostics": {
+                        "enabled": false
+                      }
+                    },
+                    "licenseType": "[[if(parameters('HybridUseBenefit'), 'Windows_Server', null())]"
+                  },
+                  "dependsOn": [
+                    "[[resourceId('Microsoft.Network/networkInterfaces', parameters('NicName'))]"
+                  ]
+                },
+                {
+                  "type": "Microsoft.Compute/virtualMachines/extensions",
+                  "apiVersion": "2021-03-01",
+                  "name": "[[format('{0}/{1}', parameters('VmName'), 'CustomScriptExtension')]",
+                  "location": "[[parameters('Location')]",
+                  "tags": "[[parameters('Tags')]",
+                  "properties": {
+                    "publisher": "Microsoft.Compute",
+                    "type": "CustomScriptExtension",
+                    "typeHandlerVersion": "1.10",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "fileUris": [
+                        "[[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
+                      ],
+                      "timestamp": "[[parameters('Timestamp')]"
+                    },
+                    "protectedSettings": {
+                      "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                    }
+                  },
+                  "dependsOn": [
+                    "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VmName'))]"
+                  ]
+                }
+              ]
+            }
           },
           "resources": [
             {
+              "type": "Microsoft.Resources/templateSpecs",
+              "apiVersion": "2021-05-01",
+              "name": "[parameters('TemplateSpecName')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "description": "Deploys a virtual machine to run the \"FSLogix Disk Shrink\" tool against an SMB share containing FSLogix profile containers.",
+                "displayName": "FSLogix Disk Shrink solution"
+              }
+            },
+            {
+              "type": "Microsoft.Resources/templateSpecs/versions",
+              "apiVersion": "2021-05-01",
+              "name": "[format('{0}/{1}', parameters('TemplateSpecName'), '1.0')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "mainTemplate": "[variables('$fxv#0')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/templateSpecs', parameters('TemplateSpecName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "VersionResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Resources/templateSpecs/versions', parameters('TemplateSpecName'), '1.0')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('AutomationAccount_{0}', parameters('Timestamp'))]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "AutomationAccountName": {
+            "value": "[variables('AutomationAccountName')]"
+          },
+          "DeleteOlderThanDays": {
+            "value": "[parameters('DeleteOlderThanDays')]"
+          },
+          "DiskName": {
+            "value": "[variables('DiskName')]"
+          },
+          "FileShareResourceIds": {
+            "value": "[parameters('FileShareResourceIds')]"
+          },
+          "Frequency": {
+            "value": "[parameters('Frequency')]"
+          },
+          "HybridUseBenefit": {
+            "value": "[parameters('HybridUseBenefit')]"
+          },
+          "KeyVaultName": {
+            "value": "[variables('KeyVaultName')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "LogAnalyticsWorkspaceResourceId": {
+            "value": "[parameters('LogAnalyticsWorkspaceResourceId')]"
+          },
+          "NicName": {
+            "value": "[variables('NicName')]"
+          },
+          "RecurrenceDateTime": {
+            "value": "[parameters('RecurrenceDateTime')]"
+          },
+          "RoleAssignmentResourceGroups": {
+            "value": "[variables('RoleAssignmentResourceGroups')]"
+          },
+          "RoleDefinitionIds": {
+            "value": "[variables('RoleDefinitionIds')]"
+          },
+          "RunbookName": {
+            "value": "[variables('RunbookName')]"
+          },
+          "RunbookScriptName": {
+            "value": "[variables('RunbookScriptName')]"
+          },
+          "SubnetName": {
+            "value": "[parameters('SubnetName')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "TemplateSpecVersionResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp'))), '2022-09-01').outputs.VersionResourceId.value]"
+          },
+          "TimeZone": {
+            "value": "[variables('TimeZone')]"
+          },
+          "UserAssignedIdentityClientId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ClientId.value]"
+          },
+          "UserAssignedIdentityResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+          },
+          "VirtualNetworkName": {
+            "value": "[parameters('VirtualNetworkName')]"
+          },
+          "VirtualNetworkResourceGroupName": {
+            "value": "[parameters('VirtualNetworkResourceGroupName')]"
+          },
+          "VmName": {
+            "value": "[variables('VmName')]"
+          },
+          "VmSize": {
+            "value": "[parameters('VmSize')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.16.1.55165",
+              "templateHash": "3850235555727776276"
+            }
+          },
+          "parameters": {
+            "_artifactsLocation": {
+              "type": "string"
+            },
+            "_artifactsLocationSasToken": {
+              "type": "securestring"
+            },
+            "AutomationAccountName": {
+              "type": "string"
+            },
+            "DeleteOlderThanDays": {
+              "type": "int"
+            },
+            "DiskName": {
+              "type": "string"
+            },
+            "FileShareResourceIds": {
+              "type": "array"
+            },
+            "Frequency": {
+              "type": "string"
+            },
+            "HybridUseBenefit": {
+              "type": "bool"
+            },
+            "JobScheduleName": {
+              "type": "string",
+              "defaultValue": "[newGuid()]"
+            },
+            "KeyVaultName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "LogAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            },
+            "NicName": {
+              "type": "string"
+            },
+            "RecurrenceDateTime": {
+              "type": "string"
+            },
+            "RoleAssignmentResourceGroups": {
+              "type": "array"
+            },
+            "RoleDefinitionIds": {
+              "type": "object"
+            },
+            "RunbookName": {
+              "type": "string"
+            },
+            "RunbookScriptName": {
+              "type": "string"
+            },
+            "SubnetName": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "TemplateSpecVersionResourceId": {
+              "type": "string"
+            },
+            "TimeZone": {
+              "type": "string"
+            },
+            "UserAssignedIdentityClientId": {
+              "type": "string"
+            },
+            "UserAssignedIdentityResourceId": {
+              "type": "string"
+            },
+            "VirtualNetworkName": {
+              "type": "string"
+            },
+            "VirtualNetworkResourceGroupName": {
+              "type": "string"
+            },
+            "VmName": {
+              "type": "string"
+            },
+            "VmSize": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Automation/automationAccounts",
+              "apiVersion": "2021-06-22",
+              "name": "[parameters('AutomationAccountName')]",
+              "location": "[parameters('Location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "sku": {
+                  "name": "Free"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Automation/automationAccounts/runbooks",
+              "apiVersion": "2019-06-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('RunbookName'))]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "description": "FSLogix Disk Shrink Automation",
+                "runbookType": "PowerShell",
+                "logProgress": false,
+                "logVerbose": false,
+                "logActivityTrace": 0,
+                "publishContentLink": {
+                  "uri": "[format('{0}{1}{2}', parameters('_artifactsLocation'), parameters('RunbookScriptName'), parameters('_artifactsLocationSasToken'))]",
+                  "version": "1.0.0.0"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Automation/automationAccounts/schedules",
+              "apiVersion": "2022-08-08",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), format('{0}_{1}', parameters('RunbookName'), parameters('Frequency')))]",
+              "properties": {
+                "frequency": "Day",
+                "interval": 1,
+                "startTime": "[parameters('RecurrenceDateTime')]",
+                "timeZone": "[parameters('TimeZone')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Automation/automationAccounts/jobSchedules",
+              "apiVersion": "2022-08-08",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('JobScheduleName'))]",
+              "properties": {
+                "parameters": {
+                  "_artifactsLoction": "[parameters('_artifactsLocation')]",
+                  "DeleteOlderThanDays": "[string(parameters('DeleteOlderThanDays'))]",
+                  "DiskName": "[parameters('DiskName')]",
+                  "EnvironmentName": "[environment().name]",
+                  "FileShareResourceIds": "[string(parameters('FileShareResourceIds'))]",
+                  "HybridUseBenefit": "[string(parameters('HybridUseBenefit'))]",
+                  "KeyVaultName": "[parameters('KeyVaultName')]",
+                  "Location": "[parameters('Location')]",
+                  "NicName": "[parameters('NicName')]",
+                  "ResourceGroupName": "[resourceGroup().name]",
+                  "SubnetName": "[parameters('SubnetName')]",
+                  "SubscriptionId": "[subscription().subscriptionId]",
+                  "Tags": "[string(parameters('Tags'))]",
+                  "TemplateSpecId": "[parameters('TemplateSpecVersionResourceId')]",
+                  "TenantId": "[subscription().tenantId]",
+                  "UserAssignedIdentityClientId": "[parameters('UserAssignedIdentityClientId')]",
+                  "UserAssignedIdentityResourceId": "[parameters('UserAssignedIdentityResourceId')]",
+                  "VirtualNetworkName": "[parameters('VirtualNetworkName')]",
+                  "VirtualNetworkResourceGroupName": "[parameters('VirtualNetworkResourceGroupName')]",
+                  "VmName": "[parameters('VmName')]",
+                  "VmSize": "[parameters('VmSize')]"
+                },
+                "runbook": {
+                  "name": "[parameters('RunbookName')]"
+                },
+                "schedule": {
+                  "name": "[format('{0}_{1}', parameters('RunbookName'), parameters('Frequency'))]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]",
+                "[resourceId('Microsoft.Automation/automationAccounts/runbooks', parameters('AutomationAccountName'), parameters('RunbookName'))]",
+                "[resourceId('Microsoft.Automation/automationAccounts/schedules', parameters('AutomationAccountName'), format('{0}_{1}', parameters('RunbookName'), parameters('Frequency')))]"
+              ]
+            },
+            {
+              "condition": "[not(empty(parameters('LogAnalyticsWorkspaceResourceId')))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2017-05-01-preview",
+              "scope": "[format('Microsoft.Automation/automationAccounts/{0}', parameters('AutomationAccountName'))]",
+              "name": "[format('diag-{0}', parameters('AutomationAccountName'))]",
+              "properties": {
+                "logs": [
+                  {
+                    "category": "JobLogs",
+                    "enabled": true
+                  },
+                  {
+                    "category": "JobStreams",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceResourceId')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            },
+            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-10-01-preview",
-              "name": "[guid(parameters('AutomationAccountId'), variables('RoleDefinitionId'), resourceGroup().id)]",
+              "name": "[guid(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), parameters('RoleDefinitionIds').Reader, resourceGroup().id)]",
               "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionId'))]",
-                "principalId": "[parameters('AutomationAccountId')]",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').Reader)]",
+                "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "name": "[guid(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), parameters('RoleDefinitionIds').ManagedIdentityOperator, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').ManagedIdentityOperator)]",
+                "principalId": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "roleAssignments_VirtualMachineContributor",
+                "count": "[length(range(0, length(parameters('RoleAssignmentResourceGroups'))))]",
+                "mode": "serial",
+                "batchSize": 1
+              },
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('RoleAssignment_{0}', parameters('RoleAssignmentResourceGroups')[range(0, length(parameters('RoleAssignmentResourceGroups')))[copyIndex()]])]",
+              "resourceGroup": "[parameters('RoleAssignmentResourceGroups')[range(0, length(parameters('RoleAssignmentResourceGroups')))[copyIndex()]]]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "AutomationAccountId": {
+                    "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.16.1.55165",
+                      "templateHash": "2385782021182848203"
+                    }
+                  },
+                  "parameters": {
+                    "AutomationAccountId": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "RoleDefinitionId": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2020-10-01-preview",
+                      "name": "[guid(parameters('AutomationAccountId'), variables('RoleDefinitionId'), resourceGroup().id)]",
+                      "properties": {
+                        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', variables('RoleDefinitionId'))]",
+                        "principalId": "[parameters('AutomationAccountId')]",
+                        "principalType": "ServicePrincipal"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "PrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
+            },
+            "ResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('KeyVault_{0}', parameters('Timestamp'))]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AutomationAccountPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+          },
+          "AutomationAccountResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+          },
+          "KeyVaultName": {
+            "value": "[variables('KeyVaultName')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "RoleDefinitionIds": {
+            "value": "[variables('RoleDefinitionIds')]"
+          },
+          "SasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          },
+          "UserAssignedIdentityPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+          },
+          "UserAssignedIdentityResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+          },
+          "VmPassword": {
+            "value": "[parameters('VmPassword')]"
+          },
+          "VmUsername": {
+            "value": "[parameters('VmUsername')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.16.1.55165",
+              "templateHash": "2855029593225832550"
+            }
+          },
+          "parameters": {
+            "SasToken": {
+              "type": "string"
+            },
+            "AutomationAccountPrincipalId": {
+              "type": "string"
+            },
+            "AutomationAccountResourceId": {
+              "type": "string"
+            },
+            "KeyVaultName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "RoleDefinitionIds": {
+              "type": "object"
+            },
+            "UserAssignedIdentityPrincipalId": {
+              "type": "string"
+            },
+            "UserAssignedIdentityResourceId": {
+              "type": "string"
+            },
+            "VmPassword": {
+              "type": "securestring"
+            },
+            "VmUsername": {
+              "type": "securestring"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2021-10-01",
+              "name": "[parameters('KeyVaultName')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                  "family": "A",
+                  "name": "standard"
+                },
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForDiskEncryption": false,
+                "enableRbacAuthorization": true,
+                "enableSoftDelete": false,
+                "publicNetworkAccess": "Enabled"
               }
+            },
+            {
+              "condition": "[not(empty(parameters('SasToken')))]",
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2021-10-01",
+              "name": "[format('{0}/{1}', parameters('KeyVaultName'), 'SasToken')]",
+              "properties": {
+                "value": "[parameters('SasToken')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2021-10-01",
+              "name": "[format('{0}/{1}', parameters('KeyVaultName'), 'VmPassword')]",
+              "properties": {
+                "value": "[parameters('VmPassword')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2021-10-01",
+              "name": "[format('{0}/{1}', parameters('KeyVaultName'), 'VmUsername')]",
+              "properties": {
+                "value": "[parameters('VmUsername')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('KeyVaultName'))]",
+              "name": "[guid(parameters('UserAssignedIdentityResourceId'), parameters('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').KeyVaultSecretsUser)]",
+                "principalId": "[parameters('UserAssignedIdentityPrincipalId')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('KeyVaultName'))]",
+              "name": "[guid(parameters('AutomationAccountResourceId'), parameters('RoleDefinitionIds').KeyVaultSecretsUser, resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionIds').KeyVaultSecretsUser)]",
+                "principalId": "[parameters('AutomationAccountPrincipalId')]",
+                "principalType": "ServicePrincipal"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
+              ]
             }
           ]
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Automation/automationAccounts', variables('AutomationAccountName'))]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
       ]
     }
   ]

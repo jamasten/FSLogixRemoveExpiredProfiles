@@ -1,3 +1,6 @@
+targetScope = 'subscription'
+
+
 @description('The URL prefix for remote assets.')
 param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/FSLogixRemoveExpiredProfiles/main/artifacts/'
 
@@ -35,11 +38,8 @@ param HybridUseBenefit bool = false
 @description('The unique identifier between each business unit or project supporting AVD in your tenant. This is the unique naming component between each AVD stamp.')
 param Identifier string = 'avd'
 
-@description('DO NOT MODIFY THIS VALUE! The name of the Job Schedule must be set as a unique GUID during each deployment.')
-param JobScheduleName string = newGuid()
-
 @description('The deployment location for the solution.')
-param Location string = resourceGroup().location
+param Location string = deployment().location
 
 @description('The resource ID for the Log Analytics Workspace to collect log data and send alerts.')
 param LogAnalyticsWorkspaceResourceId string = ''
@@ -52,6 +52,9 @@ param SubnetName string = 'Clients'
 
 @description('Add key / value pairs to include metadata on the Azure resources.')
 param Tags object = {}
+
+@description('DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter.')
+param Timestamp string = utcNow('yyyyMMddhhmmss')
 
 @description('Virtual network for the virtual machine to run the tool.')
 param VirtualNetworkName string
@@ -130,8 +133,9 @@ var LocationShortNames = {
 }
 var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}-fslogix'
 var NicName = 'nic-${NamingStandard}'
+var ResourceGroupName = 'rg-${NamingStandard}'
 var RoleAssignmentResourceGroups = [
-  resourceGroup().name
+  ResourceGroupName
   VirtualNetworkResourceGroupName
 ]
 var RoleDefinitionIds = {
@@ -204,223 +208,80 @@ var UserAssignedIdentityName = 'uai-${NamingStandard}'
 var VmName = 'vm-${NamingStandard}'
 
 
+resource rg 'Microsoft.Resources/resourceGroups@2019-10-01' = {
+  name: ResourceGroupName
+  location: Location
+  tags: Tags
+  properties: {}
+}
+
+
 // The User Assigned Identity is attached to the virtual machine when its deployed so it has access to grab Key Vault secrets
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: UserAssignedIdentityName
-  location: Location
-}
-
-// The Template Spec is deployed by the Automation Runbook to create the virtual machine and run the tool
-resource templateSpec 'Microsoft.Resources/templateSpecs@2021-05-01' = {
-  name: TemplateSpecName
-  location: Location
-  properties: {
-    description: 'Deploys a virtual machine to run the "FSLogix Disk Shrink" tool against an SMB share containing FSLogix profile containers.'
-    displayName: 'FSLogix Disk Shrink solution'
-  }
-}
-
-resource templateSpecVersion 'Microsoft.Resources/templateSpecs/versions@2021-05-01' = {
-  parent: templateSpec
-  name: '1.0'
-  location: Location
-  properties: {
-    mainTemplate: loadJsonContent('modules/templateSpecVersion.json')
-  }
-}
-
-// The Automation Account stores the runbook that kicks off the tool
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
-  name: AutomationAccountName
-  location: Location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    sku: {
-      name: 'Free'
-    }
-  }
-}
-
-// The Runbook orchestrates the deployment and manages the resources to run the tool
-resource runbook 'Microsoft.Automation/automationAccounts/runbooks@2019-06-01' = {
-  parent: automationAccount
-  name: RunbookName
-  location: Location
-  properties: {
-    description: 'FSLogix Disk Shrink Automation'
-    runbookType: 'PowerShell'
-    logProgress: false
-    logVerbose: false
-    logActivityTrace: 0
-    publishContentLink: {
-      uri: '${_artifactsLocation}${RunbookScriptName}${_artifactsLocationSasToken}'
-      version: '1.0.0.0'
-    }
-  }
-}
-
-// Gives the Managed Identity for the Automation Account rights to deploy the VM to shrink FSLogix disks
-@batchSize(1)
-module roleAssignments_VirtualMachineContributor 'modules/roleAssignments.bicep' = [for i in range(0, length(RoleAssignmentResourceGroups)): {
-  name: 'RoleAssignment_${RoleAssignmentResourceGroups[i]}'
-  scope: resourceGroup(RoleAssignmentResourceGroups[i])
+module userAssignedIdentity 'modules/userAssignedIdentity.bicep' = {
+  name: 'UserAssignedIdentityName_${Timestamp}'
+  scope: rg
   params: {
-    AutomationAccountId: automationAccount.identity.principalId
-  }
-}]
-
-// Gives the Managed Identity for the Automation Account rights to deploy the Template Spec
-resource roleAssignment_Reader 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(automationAccount.id, RoleDefinitionIds.Reader, resourceGroup().id)
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.Reader)
-    principalId: automationAccount.identity.principalId
-    principalType: 'ServicePrincipal'
+    Location: Location
+    UserAssignedIdentityName: UserAssignedIdentityName
   }
 }
 
-// Gives the Managed Identity for the Automation Account rights to add the User Assigned Idenity to the virtual machine
-resource roleAssignment_ManagedIdentityOperator 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(automationAccount.id, RoleDefinitionIds.ManagedIdentityOperator, resourceGroup().id)
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.ManagedIdentityOperator)
-    principalId: automationAccount.identity.principalId
-    principalType: 'ServicePrincipal'
+module templateSpec 'modules/templateSpec.bicep' = {
+  scope: rg
+  name: 'TemplateSpec_${Timestamp}'
+  params: {
+    Location: Location
+    TemplateSpecName: TemplateSpecName
   }
 }
 
-// The Key Vault stores the secrets to deploy virtual machine and mount the SMB share(s)
-resource keyVault 'Microsoft.KeyVault/vaults@2021-10-01' = {
-  name: KeyVaultName
-  location: Location
-  properties: {
-    tenantId: subscription().tenantId
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    enabledForDeployment: true
-    enabledForTemplateDeployment: true
-    enabledForDiskEncryption: false
-    enableRbacAuthorization: true
-    enableSoftDelete: false
-    publicNetworkAccess: 'Enabled'
-  }
-  dependsOn: []
-}
-
-// Key Vault Secret for the SAS token on the storage account or container
-resource secret_SasToken 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = if(!empty(_artifactsLocationSasToken)) {
-  parent: keyVault
-  name: 'SasToken'
-  properties: {
-    value: _artifactsLocationSasToken
-  }
-}
-
-// Key Vault Secret for the local admin password on the virtual machine
-resource secret_VmPassword 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
-  parent: keyVault
-  name: 'VmPassword'
-  properties: {
-    value: VmPassword
+module automationAccount 'modules/automationAccount.bicep' = {
+  scope: rg
+  name: 'AutomationAccount_${Timestamp}'
+  params: {
+    _artifactsLocation: _artifactsLocation
+    _artifactsLocationSasToken: _artifactsLocationSasToken
+    AutomationAccountName: AutomationAccountName
+    DeleteOlderThanDays: DeleteOlderThanDays
+    DiskName: DiskName
+    FileShareResourceIds: FileShareResourceIds
+    Frequency: Frequency
+    HybridUseBenefit: HybridUseBenefit
+    KeyVaultName: KeyVaultName
+    Location: Location
+    LogAnalyticsWorkspaceResourceId: LogAnalyticsWorkspaceResourceId
+    NicName: NicName
+    RecurrenceDateTime: RecurrenceDateTime
+    RoleAssignmentResourceGroups: RoleAssignmentResourceGroups
+    RoleDefinitionIds: RoleDefinitionIds
+    RunbookName: RunbookName
+    RunbookScriptName: RunbookScriptName
+    SubnetName: SubnetName
+    Tags: Tags
+    TemplateSpecVersionResourceId: templateSpec.outputs.VersionResourceId
+    TimeZone: TimeZone
+    UserAssignedIdentityClientId: userAssignedIdentity.outputs.ClientId
+    UserAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
+    VirtualNetworkName: VirtualNetworkName
+    VirtualNetworkResourceGroupName: VirtualNetworkResourceGroupName
+    VmName: VmName
+    VmSize: VmSize
   }
 }
 
-// Key Vault Secret for the local admin username on the virtual machine
-resource secret_VmUsername 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
-  parent: keyVault
-  name: 'VmUsername'
-  properties: {
-    value: VmUsername
-  }
-}
-
-// Gives the Managed Identity for the Automation Account rights to get key vault secrects
-resource roleAssignment_KeyVaultSecretsUser01 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(automationAccount.id, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.KeyVaultSecretsUser)
-    principalId: automationAccount.identity.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-// Gives the User Assigned Identity rights to get key vault secrets
-resource roleAssignment_KeyVaultSecretsUser02 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(userAssignedIdentity.id, RoleDefinitionIds.KeyVaultSecretsUser, resourceGroup().id)
-  scope: keyVault
-  properties: {
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionIds.KeyVaultSecretsUser)
-    principalId: userAssignedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource schedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08' = {
-  parent: automationAccount
-  name: '${RunbookName}_${Frequency}'
-  properties: {
-    frequency: 'Day'
-    interval: 1
-    startTime: RecurrenceDateTime
-    timeZone: TimeZone
-  }
-}
-
-resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-08-08' = {
-  parent: automationAccount
-  name: JobScheduleName
-  properties: {
-    parameters: {
-      _artifactsLoction: _artifactsLocation
-      DeleteOlderThanDays: string(DeleteOlderThanDays)
-      DiskName: DiskName
-      EnvironmentName: environment().name
-      FileShareResourceIds: string(FileShareResourceIds)
-      HybridUseBenefit: string(HybridUseBenefit)
-      KeyVaultName: keyVault.name
-      Location: Location
-      NicName: NicName
-      ResourceGroupName: resourceGroup().name
-      SubnetName: SubnetName
-      SubscriptionId: subscription().subscriptionId
-      Tags: string(Tags)
-      TemplateSpecId: templateSpecVersion.id
-      TenantId: subscription().tenantId
-      UserAssignedIdentityClientId: userAssignedIdentity.properties.clientId
-      UserAssignedIdentityResourceId: userAssignedIdentity.id
-      VirtualNetworkName: VirtualNetworkName
-      VirtualNetworkResourceGroupName: VirtualNetworkResourceGroupName
-      VmName: VmName
-      VmSize: VmSize
-    }
-    runbook: {
-      name: runbook.name
-    }
-    schedule: {
-      name: schedule.name
-    }
-  }
-}
-
-resource diagnostics 'Microsoft.Insights/diagnosticsettings@2017-05-01-preview' = if (!empty(LogAnalyticsWorkspaceResourceId)) {
-  scope: automationAccount
-  name: 'diag-${automationAccount.name}'
-  properties: {
-    logs: [
-      {
-        category: 'JobLogs'
-        enabled: true
-      }
-      {
-        category: 'JobStreams'
-        enabled: true
-      }
-    ]
-    workspaceId: LogAnalyticsWorkspaceResourceId
+module keyVault 'modules/keyVault.bicep' = {
+  scope: rg
+  name: 'KeyVault_${Timestamp}'
+  params: {
+    AutomationAccountPrincipalId: automationAccount.outputs.PrincipalId
+    AutomationAccountResourceId: automationAccount.outputs.ResourceId
+    KeyVaultName: KeyVaultName
+    Location: Location
+    RoleDefinitionIds: RoleDefinitionIds
+    SasToken: _artifactsLocationSasToken
+    UserAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
+    UserAssignedIdentityResourceId: userAssignedIdentity.outputs.ResourceId
+    VmPassword: VmPassword
+    VmUsername: VmUsername
   }
 }
