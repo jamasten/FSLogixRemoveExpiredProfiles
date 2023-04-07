@@ -48,7 +48,7 @@ param LogAnalyticsWorkspaceResourceId string = ''
 param RecurrenceDateTime string = '2023-01-01T23:00:00'
 
 @description('The subnet for the AVD session hosts.')
-param SubnetName string = 'Clients'
+param SubnetName string
 
 @description('Add key / value pairs to include metadata on the Azure resources.')
 param Tags object = {}

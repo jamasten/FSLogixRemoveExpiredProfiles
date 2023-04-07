@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "13503990102016856121"
+      "templateHash": "11991299878869921920"
     }
   },
   "parameters": {
@@ -97,7 +97,6 @@
     },
     "SubnetName": {
       "type": "string",
-      "defaultValue": "Clients",
       "metadata": {
         "description": "The subnet for the AVD session hosts."
       }
