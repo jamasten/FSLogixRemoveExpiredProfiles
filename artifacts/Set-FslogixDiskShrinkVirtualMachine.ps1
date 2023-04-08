@@ -1,9 +1,5 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-	[Parameter(Mandatory)]
-	[string]
-	$_artifactsLocation,
-
     [parameter(Mandatory)]
     [string]
     $DeleteOlderThanDays,
@@ -40,6 +36,10 @@ param(
 	[string]
 	$ResourceGroupName,
 
+	[Parameter(Mandatory)]
+	[string]
+	$ScriptUri,
+	
 	[Parameter(Mandatory)]
 	[string]
 	$SubnetName,
@@ -104,7 +104,7 @@ try
 		Location = $Location
 		NicName = $NicName
 		ResourceGroupName = $ResourceGroupName
-		ScriptUri = $_artifactsLoction
+		ScriptUri = $ScriptUri
 		SubnetName = $SubnetName
 		TemplateSpecId = $TemplateSpecId
 		UserAssignedIdentityClientId = $UserAssignedIdentityClientId
