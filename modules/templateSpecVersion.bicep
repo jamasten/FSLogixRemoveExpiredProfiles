@@ -3,7 +3,7 @@ param DiskName string
 param FileShareResourceIds array
 param HybridUseBenefit bool
 param KeyVaultName string
-param Location string
+param Location string = resourceGroup().location
 param NicName string
 param SasToken bool
 param ScriptUri string
