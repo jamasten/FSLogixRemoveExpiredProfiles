@@ -96,10 +96,10 @@ try
 	Write-Output 'Imported modules successfully'
 
 	$Params = @{		
-		DeleteOlderThanDays = $DeleteOlderThanDays.ToInt32()
+		DeleteOlderThanDays = [convert]::ToInt32($DeleteOlderThanDays, 10)
 		DiskName = $DiskName
 		FileShareResourceIds = $FileShareResourceIds
-		HybridUseBenefit = $HybridUseBenefit.ToBoolean()
+		HybridUseBenefit = [convert]::ToBoolean($HybridUseBenefit)
 		KeyVaultName = $KeyVaultName
 		Location = $Location
 		NicName = $NicName
