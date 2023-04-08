@@ -81,12 +81,13 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
       DeleteOlderThanDays: string(DeleteOlderThanDays)
       DiskName: DiskName
       EnvironmentName: environment().name
-      FileShareResourceIds: string(FileShareResourceIds)
+      FileShareResourceIds: replace(replace(string(FileShareResourceIds), '[', ''), ']', '')
       HybridUseBenefit: string(HybridUseBenefit)
       KeyVaultName: KeyVaultName
       Location: Location
       NicName: NicName
       ResourceGroupName: resourceGroup().name
+      SasToken: empty(_artifactsLocationSasToken) ? 'false' : 'true'
       ScriptUri: _artifactsLocation
       SubnetName: SubnetName
       SubscriptionId: subscription().subscriptionId
