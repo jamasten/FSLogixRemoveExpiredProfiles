@@ -36,9 +36,8 @@ param Frequency string = 'Day'
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false
 
-@maxLength(3)
-@description('The unique identifier between each business unit or project supporting AVD in your tenant. This is the unique naming component between each AVD stamp.')
-param Identifier string = 'avd'
+@description('The unique identifier that describes the purpose of the Azure resource group and resources.')
+param Identifier string = 'fslogix'
 
 @description('The deployment location for the solution.')
 param Location string = deployment().location
@@ -130,7 +129,7 @@ var LocationShortNames = {
   westus2: 'wu2'
   westus3: 'wu3'
 }
-var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}-fslogix'
+var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}'
 var NicName = 'nic-${NamingStandard}'
 var ResourceGroupName = 'rg-${NamingStandard}'
 var RoleAssignmentResourceGroups = [
@@ -143,8 +142,8 @@ var RoleDefinitionIds = {
   Reader: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
   VirtualMachineContributor: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
 }
-var RunbookName = 'FslogixDiskShrink'
-var RunbookScriptName = 'Set-FslogixDiskShrinkVirtualMachine.ps1'
+var RunbookName = 'Remove-ExpiredFslogixDisks'
+var RunbookScriptName = 'New-VirtualMachineDeployment.ps1'
 var TemplateSpecName = 'ts-${NamingStandard}'
 var TimeZone = TimeZones[Location]
 var TimeZones = {

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "18037679374289457126"
+      "templateHash": "9304159020065206705"
     }
   },
   "parameters": {
@@ -73,11 +73,10 @@
     },
     "Identifier": {
       "type": "string",
-      "defaultValue": "avd",
+      "defaultValue": "fslogix",
       "metadata": {
-        "description": "The unique identifier between each business unit or project supporting AVD in your tenant. This is the unique naming component between each AVD stamp."
-      },
-      "maxLength": 3
+        "description": "The unique identifier that describes the purpose of the Azure resource group and resources."
+      }
     },
     "Location": {
       "type": "string",
@@ -206,7 +205,7 @@
       "westus2": "wu2",
       "westus3": "wu3"
     },
-    "NamingStandard": "[format('{0}-{1}-{2}-fslogix', parameters('Identifier'), parameters('Environment'), variables('LocationShortName'))]",
+    "NamingStandard": "[format('{0}-{1}-{2}', parameters('Identifier'), parameters('Environment'), variables('LocationShortName'))]",
     "NicName": "[format('nic-{0}', variables('NamingStandard'))]",
     "ResourceGroupName": "[format('rg-{0}', variables('NamingStandard'))]",
     "RoleAssignmentResourceGroups": [
@@ -219,8 +218,8 @@
       "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
       "VirtualMachineContributor": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
     },
-    "RunbookName": "FslogixDiskShrink",
-    "RunbookScriptName": "Set-FslogixDiskShrinkVirtualMachine.ps1",
+    "RunbookName": "Remove-ExpiredFslogixDisks",
+    "RunbookScriptName": "New-VirtualMachineDeployment.ps1",
     "TemplateSpecName": "[format('ts-{0}', variables('NamingStandard'))]",
     "TimeZone": "[variables('TimeZones')[parameters('Location')]]",
     "TimeZones": {
@@ -400,7 +399,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "14325553059055591461"
+              "templateHash": "6025617865174714122"
             }
           },
           "parameters": {
@@ -419,7 +418,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.1.55165",
-                  "templateHash": "8092663549526234992"
+                  "templateHash": "8403086646255997748"
                 }
               },
               "parameters": {
@@ -564,7 +563,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.16.1.55165",
-                          "templateHash": "13568186833976123806"
+                          "templateHash": "9879382867219638016"
                         }
                       },
                       "parameters": {
@@ -734,7 +733,7 @@
                             "autoUpgradeMinorVersion": true,
                             "settings": {
                               "fileUris": [
-                                "[[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
+                                "[[format('{0}Remove-ExpiredFslogixDisks.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
                               ],
                               "timestamp": "[[parameters('Timestamp')]"
                             },

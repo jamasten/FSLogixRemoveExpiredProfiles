@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "8092663549526234992"
+      "templateHash": "8403086646255997748"
     }
   },
   "parameters": {
@@ -150,7 +150,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "13568186833976123806"
+              "templateHash": "9879382867219638016"
             }
           },
           "parameters": {
@@ -320,7 +320,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[format('{0}Set-FslogixDiskSize.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
+                    "[format('{0}Remove-ExpiredFslogixDisks.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },

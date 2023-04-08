@@ -123,7 +123,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        '${ScriptUri}Set-FslogixDiskSize.ps1${SasToken}'
+        '${ScriptUri}Remove-ExpiredFslogixDisks.ps1${SasToken}'
       ]
       timestamp: Timestamp
     }
