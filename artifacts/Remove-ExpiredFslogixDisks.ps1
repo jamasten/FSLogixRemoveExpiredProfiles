@@ -135,9 +135,10 @@ try
 	##############################################################
     foreach($FileShareResourceId in $PSFileSharesResourceIds)
     {
-        $StorageAccount = $FileShareResourceId.Split('/')[8]
+        $StorageAccountResourceGroupName = $FileShareResourceId.Split('/')[4]
+        $StorageAccountName = $FileShareResourceId.Split('/')[8]
         $Share = $FileShareResourceId.Split('/')[12]
-        $FileServer = '\\' + $StorageAccount + $FilesSuffix
+        $FileServer = '\\' + $StorageAccountName + $FilesSuffix
 
         # Get the storage account key
         Connect-AzAccount -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId -Identity -AccountId $UserAssignedIdentityClientId
