@@ -17,7 +17,7 @@ param(
 	$FileShareResourceIds,
 
 	[Parameter(Mandatory)]
-	[string]
+	[bool]
 	$HybridUseBenefit,
 
 	[Parameter(Mandatory)]
