@@ -26,10 +26,6 @@ param(
 
 	[Parameter(Mandatory)]
 	[string]
-	$Location,
-
-	[Parameter(Mandatory)]
-	[string]
 	$NicName,
 
 	[Parameter(Mandatory)]
@@ -99,27 +95,6 @@ try
 	Import-Module -Name 'Az.Resources'
 	Write-Output 'Imported modules successfully'
 
-	$Params = @{		
-		DeleteOlderThanDays = [convert]::ToInt32($DeleteOlderThanDays, 10)
-		DiskName = $DiskName
-		FileShareResourceIds = $FileShareResourceIds -split ','
-		HybridUseBenefit = [bool]::Parse($HybridUseBenefit)
-		KeyVaultName = $KeyVaultName
-		Location = $Location
-		NicName = $NicName
-		ResourceGroupName = $ResourceGroupName
-		SasToken = [bool]::Parse($SasToken)
-		ScriptUri = $ScriptUri
-		SubnetName = $SubnetName
-		TemplateSpecId = $TemplateSpecId
-		UserAssignedIdentityClientId = $UserAssignedIdentityClientId
-		UserAssignedIdentityResourceId = $UserAssignedIdentityResourceId
-		VirtualNetworkName = $VirtualNetworkName
-		VirtualNetworkResourceGroupName = $VirtualNetworkResourceGroupName
-		VmName = $VmName
-		VmSize = $VmSize
-	}
-
 	# Add conditional params
 	if(!($Tags -eq 'None'))
 	{
@@ -132,7 +107,25 @@ try
 	Write-Output 'Connected to Azure'
 
 	# Deploy the virtual machine & run the tool
-	New-AzResourceGroupDeployment @Params
+	New-AzResourceGroupDeployment `
+		-ResourceGroupName $ResourceGroupName `
+		-TemplateSpecId $TemplateSpecId `
+		-DeleteOlderThanDays $([convert]::ToInt32($DeleteOlderThanDays, 10)) `
+		-DiskName $DiskName `
+		-FileShareResourceIds $FileShareResourceIds -split ',' `
+		-HybridUseBenefit $([bool]::Parse($HybridUseBenefit)) `
+		-KeyVaultName $KeyVaultName `
+		-NicName $NicName `
+		-SasToken $([bool]::Parse($SasToken)) `
+		-ScriptUri $ScriptUri `
+		-SubnetName $SubnetName `
+		-UserAssignedIdentityClientId $UserAssignedIdentityClientId `
+		-UserAssignedIdentityResourceId $UserAssignedIdentityResourceId `
+		-VirtualNetworkName $VirtualNetworkName `
+		-VirtualNetworkResourceGroupName $VirtualNetworkResourceGroupName `
+		-VmName $VmName `
+		-VmSize $VmSize
+	
 	Write-Output 'Removed expired FSLogix profiles'
 
 	# Delete the virtual machine
@@ -142,6 +135,6 @@ try
 catch
 {
 	Write-Output 'Failed to remove expired FSLogix profiles'
-	Write-Output $_.Exception
+	Write-Output $_ | Select-Object *
 	throw
 }
