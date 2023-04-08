@@ -13,7 +13,7 @@ param(
 	$EnvironmentName,
 
 	[Parameter(Mandatory)]
-	[array]
+	[string]
 	$FileShareResourceIds,
 
 	[Parameter(Mandatory)]
@@ -102,7 +102,7 @@ try
 	$Params = @{		
 		DeleteOlderThanDays = [convert]::ToInt32($DeleteOlderThanDays, 10)
 		DiskName = $DiskName
-		FileShareResourceIds = $FileShareResourceIds
+		FileShareResourceIds = $FileShareResourceIds -split ','
 		HybridUseBenefit = [bool]::Parse($HybridUseBenefit)
 		KeyVaultName = $KeyVaultName
 		Location = $Location
