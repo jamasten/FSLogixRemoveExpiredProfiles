@@ -78,7 +78,6 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
   name: JobScheduleName
   properties: {
     parameters: {
-      _artifactsLoction: _artifactsLocation
       DeleteOlderThanDays: string(DeleteOlderThanDays)
       DiskName: DiskName
       EnvironmentName: environment().name
@@ -88,6 +87,7 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
       Location: Location
       NicName: NicName
       ResourceGroupName: resourceGroup().name
+      ScriptUri: _artifactsLocation
       SubnetName: SubnetName
       SubscriptionId: subscription().subscriptionId
       Tags: empty(Tags) ? 'None' : string(Tags)

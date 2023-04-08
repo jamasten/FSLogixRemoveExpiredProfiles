@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "6425691496240793989"
+      "templateHash": "15456249102501613211"
     }
   },
   "parameters": {
@@ -887,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "5971763022119021423"
+              "templateHash": "8864519263618581780"
             }
           },
           "parameters": {
@@ -1033,7 +1033,6 @@
               "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('JobScheduleName'))]",
               "properties": {
                 "parameters": {
-                  "_artifactsLoction": "[parameters('_artifactsLocation')]",
                   "DeleteOlderThanDays": "[string(parameters('DeleteOlderThanDays'))]",
                   "DiskName": "[parameters('DiskName')]",
                   "EnvironmentName": "[environment().name]",
@@ -1043,6 +1042,7 @@
                   "Location": "[parameters('Location')]",
                   "NicName": "[parameters('NicName')]",
                   "ResourceGroupName": "[resourceGroup().name]",
+                  "ScriptUri": "[parameters('_artifactsLocation')]",
                   "SubnetName": "[parameters('SubnetName')]",
                   "SubscriptionId": "[subscription().subscriptionId]",
                   "Tags": "[if(empty(parameters('Tags')), 'None', string(parameters('Tags')))]",
