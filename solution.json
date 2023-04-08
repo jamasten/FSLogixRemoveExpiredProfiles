@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "15456249102501613211"
+      "templateHash": "18037679374289457126"
     }
   },
   "parameters": {
@@ -25,6 +25,7 @@
     },
     "DeleteOlderThanDays": {
       "type": "int",
+      "defaultValue": 1,
       "metadata": {
         "description": "The amount of days to keep an unused FSLogix profile before deleting it."
       }
@@ -44,12 +45,16 @@
     },
     "FileShareResourceIds": {
       "type": "array",
+      "defaultValue": [
+        "/subscriptions/3764b123-4849-4395-8e6e-ca6d68d8d4b4/resourceGroups/rg-core-d-eu/providers/Microsoft.Storage/storageAccounts/sacoredeu/files/default/shares/profile-containers"
+      ],
       "metadata": {
         "description": "The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers."
       }
     },
     "Frequency": {
       "type": "string",
+      "defaultValue": "Day",
       "metadata": {
         "description": "The frequency in which to check for expired VHDs."
       },
@@ -90,6 +95,7 @@
     },
     "SubnetName": {
       "type": "string",
+      "defaultValue": "Clients",
       "metadata": {
         "description": "The subnet for the AVD session hosts."
       }
@@ -110,12 +116,14 @@
     },
     "VirtualNetworkName": {
       "type": "string",
+      "defaultValue": "vnet-net-d-eu",
       "metadata": {
         "description": "Virtual network for the virtual machine to run the tool."
       }
     },
     "VirtualNetworkResourceGroupName": {
       "type": "string",
+      "defaultValue": "rg-net-d-eu",
       "metadata": {
         "description": "Virtual network resource group for the virtual machine to run the tool."
       }
@@ -392,7 +400,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "15627754986787090373"
+              "templateHash": "14325553059055591461"
             }
           },
           "parameters": {
@@ -411,7 +419,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.1.55165",
-                  "templateHash": "14072102559646155909"
+                  "templateHash": "8092663549526234992"
                 }
               },
               "parameters": {
@@ -436,6 +444,9 @@
                 "NicName": {
                   "type": "string"
                 },
+                "SasToken": {
+                  "type": "bool"
+                },
                 "ScriptUri": {
                   "type": "string"
                 },
@@ -443,7 +454,8 @@
                   "type": "string"
                 },
                 "Tags": {
-                  "type": "object"
+                  "type": "object",
+                  "defaultValue": {}
                 },
                 "Timestamp": {
                   "type": "string",
@@ -479,14 +491,7 @@
                     },
                     "mode": "Incremental",
                     "parameters": {
-                      "SasToken": {
-                        "reference": {
-                          "keyVault": {
-                            "id": "[[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-                          },
-                          "secretName": "SasToken"
-                        }
-                      },
+                      "SasToken": "[[if(parameters('SasToken'), createObject('reference', createObject('keyVault', createObject('id', resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))), 'secretName', 'SasToken')), createObject('value', ''))]",
                       "DeleteOlderThanDays": {
                         "value": "[[parameters('DeleteOlderThanDays')]"
                       },
@@ -498,9 +503,6 @@
                       },
                       "HybridUseBenefit": {
                         "value": "[[parameters('HybridUseBenefit')]"
-                      },
-                      "KeyVaultName": {
-                        "value": "[[parameters('KeyVaultName')]"
                       },
                       "Location": {
                         "value": "[[parameters('Location')]"
@@ -562,7 +564,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.16.1.55165",
-                          "templateHash": "4096362347607764829"
+                          "templateHash": "13568186833976123806"
                         }
                       },
                       "parameters": {
@@ -577,9 +579,6 @@
                         },
                         "HybridUseBenefit": {
                           "type": "bool"
-                        },
-                        "KeyVaultName": {
-                          "type": "string"
                         },
                         "Location": {
                           "type": "string"
@@ -740,7 +739,7 @@
                               "timestamp": "[[parameters('Timestamp')]"
                             },
                             "protectedSettings": {
-                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                             }
                           },
                           "dependsOn": [
@@ -887,7 +886,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "8864519263618581780"
+              "templateHash": "14331728511428257990"
             }
           },
           "parameters": {
@@ -1036,12 +1035,13 @@
                   "DeleteOlderThanDays": "[string(parameters('DeleteOlderThanDays'))]",
                   "DiskName": "[parameters('DiskName')]",
                   "EnvironmentName": "[environment().name]",
-                  "FileShareResourceIds": "[string(parameters('FileShareResourceIds'))]",
+                  "FileShareResourceIds": "[replace(replace(string(parameters('FileShareResourceIds')), '[', ''), ']', '')]",
                   "HybridUseBenefit": "[string(parameters('HybridUseBenefit'))]",
                   "KeyVaultName": "[parameters('KeyVaultName')]",
                   "Location": "[parameters('Location')]",
                   "NicName": "[parameters('NicName')]",
                   "ResourceGroupName": "[resourceGroup().name]",
+                  "SasToken": "[if(empty(parameters('_artifactsLocationSasToken')), 'false', 'true')]",
                   "ScriptUri": "[parameters('_artifactsLocation')]",
                   "SubnetName": "[parameters('SubnetName')]",
                   "SubscriptionId": "[subscription().subscriptionId]",
