@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "9304159020065206705"
+      "templateHash": "10593164691003498535"
     }
   },
   "parameters": {
@@ -216,6 +216,7 @@
       "KeyVaultSecretsUser": "4633458b-17de-408a-b874-0445c86b69e6",
       "ManagedIdentityOperator": "f1a07417-d97a-45cb-824c-7a7467783830",
       "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+      "ReaderAndDataAccess": "c12c1c16-33a1-487b-954d-41c89c60f349",
       "VirtualMachineContributor": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
     },
     "RunbookName": "Remove-ExpiredFslogixDisks",
@@ -399,7 +400,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "6025617865174714122"
+              "templateHash": "1864488249885781093"
             }
           },
           "parameters": {
@@ -418,7 +419,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.1.55165",
-                  "templateHash": "8403086646255997748"
+                  "templateHash": "10903440207222477011"
                 }
               },
               "parameters": {
@@ -563,7 +564,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.16.1.55165",
-                          "templateHash": "9879382867219638016"
+                          "templateHash": "15744933279881007180"
                         }
                       },
                       "parameters": {
@@ -738,7 +739,7 @@
                               "timestamp": "[[parameters('Timestamp')]"
                             },
                             "protectedSettings": {
-                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                             }
                           },
                           "dependsOn": [
@@ -1325,6 +1326,66 @@
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
         "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(subscription().id, 'CaseWorkerDeploy'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "storageRoleAssignments",
+        "count": "[length(range(0, length(parameters('FileShareResourceIds'))))]",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('RoleAssignment_{0}_{1}', range(0, length(parameters('FileShareResourceIds')))[copyIndex()], split(parameters('FileShareResourceIds')[range(0, length(parameters('FileShareResourceIds')))[copyIndex()]], '/')[4])]",
+      "resourceGroup": "[split(parameters('FileShareResourceIds')[range(0, length(parameters('FileShareResourceIds')))[copyIndex()]], '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "PrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+          },
+          "RoleDefinitionId": {
+            "value": "[variables('RoleDefinitionIds').ReaderAndDataAccess]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.16.1.55165",
+              "templateHash": "9766569436966301097"
+            }
+          },
+          "parameters": {
+            "PrincipalId": {
+              "type": "string"
+            },
+            "RoleDefinitionId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-10-01-preview",
+              "name": "[guid(parameters('PrincipalId'), parameters('RoleDefinitionId'), resourceGroup().id)]",
+              "properties": {
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
+                "principalId": "[parameters('PrincipalId')]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
       ]
     }

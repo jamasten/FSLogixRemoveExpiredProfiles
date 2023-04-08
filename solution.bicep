@@ -140,6 +140,7 @@ var RoleDefinitionIds = {
   KeyVaultSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
   ManagedIdentityOperator: 'f1a07417-d97a-45cb-824c-7a7467783830'
   Reader: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
+  ReaderAndDataAccess: 'c12c1c16-33a1-487b-954d-41c89c60f349'
   VirtualMachineContributor: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
 }
 var RunbookName = 'Remove-ExpiredFslogixDisks'
@@ -298,3 +299,13 @@ module keyVault 'modules/keyVault.bicep' = {
     VmUsername: VmUsername
   }
 }
+
+@batchSize(1)
+module storageRoleAssignments 'modules/roleAssignments.bicep' = [for i in range(0, length(FileShareResourceIds)): {
+  scope: resourceGroup(split(FileShareResourceIds[i], '/')[4])
+  name: 'RoleAssignment_${i}_${split(FileShareResourceIds[i], '/')[4]}'
+  params: {
+    PrincipalId: userAssignedIdentity.outputs.PrincipalId
+    RoleDefinitionId: RoleDefinitionIds.ReaderAndDataAccess
+  }
+}]
