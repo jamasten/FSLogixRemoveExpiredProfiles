@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "10593164691003498535"
+      "templateHash": "3578537129754211031"
     }
   },
   "parameters": {
@@ -400,7 +400,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "1864488249885781093"
+              "templateHash": "18254137260717774898"
             }
           },
           "parameters": {
@@ -419,7 +419,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.1.55165",
-                  "templateHash": "10903440207222477011"
+                  "templateHash": "8731387486089427262"
                 }
               },
               "parameters": {
@@ -439,7 +439,8 @@
                   "type": "string"
                 },
                 "Location": {
-                  "type": "string"
+                  "type": "string",
+                  "defaultValue": "[[resourceGroup().location]"
                 },
                 "NicName": {
                   "type": "string"
@@ -886,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "14331728511428257990"
+              "templateHash": "3439346324135448052"
             }
           },
           "parameters": {
@@ -1038,7 +1039,6 @@
                   "FileShareResourceIds": "[replace(replace(string(parameters('FileShareResourceIds')), '[', ''), ']', '')]",
                   "HybridUseBenefit": "[string(parameters('HybridUseBenefit'))]",
                   "KeyVaultName": "[parameters('KeyVaultName')]",
-                  "Location": "[parameters('Location')]",
                   "NicName": "[parameters('NicName')]",
                   "ResourceGroupName": "[resourceGroup().name]",
                   "SasToken": "[if(empty(parameters('_artifactsLocationSasToken')), 'false', 'true')]",

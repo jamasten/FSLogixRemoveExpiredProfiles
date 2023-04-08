@@ -84,7 +84,6 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
       FileShareResourceIds: replace(replace(string(FileShareResourceIds), '[', ''), ']', '')
       HybridUseBenefit: string(HybridUseBenefit)
       KeyVaultName: KeyVaultName
-      Location: Location
       NicName: NicName
       ResourceGroupName: resourceGroup().name
       SasToken: empty(_artifactsLocationSasToken) ? 'false' : 'true'
