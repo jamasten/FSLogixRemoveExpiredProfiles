@@ -5,6 +5,7 @@ param HybridUseBenefit bool
 param KeyVaultName string
 param Location string
 param NicName string
+param SasToken bool
 param ScriptUri string
 param SubnetName string
 param Tags object = {}
@@ -24,7 +25,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 module virtualMachine 'virtualMachine.bicep' = {
   name: 'VirtualMachine_${Timestamp}'
   params: {
-    SasToken: keyVault.getSecret('SasToken')
+    SasToken: SasToken ? keyVault.getSecret('SasToken') : ''
     DeleteOlderThanDays: DeleteOlderThanDays
     DiskName: DiskName
     FileShareResourceIds: FileShareResourceIds

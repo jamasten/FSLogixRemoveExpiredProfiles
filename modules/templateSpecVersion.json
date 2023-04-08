@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "14040666679674572247"
+      "templateHash": "8092663549526234992"
     }
   },
   "parameters": {
@@ -29,6 +29,9 @@
     },
     "NicName": {
       "type": "string"
+    },
+    "SasToken": {
+      "type": "bool"
     },
     "ScriptUri": {
       "type": "string"
@@ -74,14 +77,7 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "SasToken": {
-            "reference": {
-              "keyVault": {
-                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-              },
-              "secretName": "SasToken"
-            }
-          },
+          "SasToken": "[if(parameters('SasToken'), createObject('reference', createObject('keyVault', createObject('id', resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))), 'secretName', 'SasToken')), createObject('value', ''))]",
           "DeleteOlderThanDays": {
             "value": "[parameters('DeleteOlderThanDays')]"
           },
