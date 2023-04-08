@@ -17,7 +17,7 @@ param(
 	$FileShareResourceIds,
 
 	[Parameter(Mandatory)]
-	[bool]
+	[string]
 	$HybridUseBenefit,
 
 	[Parameter(Mandatory)]
@@ -35,6 +35,10 @@ param(
 	[Parameter(Mandatory)]
 	[string]
 	$ResourceGroupName,
+
+	[Parameter(Mandatory)]
+	[string]
+	$SasToken,
 
 	[Parameter(Mandatory)]
 	[string]
@@ -99,11 +103,12 @@ try
 		DeleteOlderThanDays = [convert]::ToInt32($DeleteOlderThanDays, 10)
 		DiskName = $DiskName
 		FileShareResourceIds = $FileShareResourceIds
-		HybridUseBenefit = [convert]::ToBoolean($HybridUseBenefit)
+		HybridUseBenefit = [bool]::Parse($HybridUseBenefit)
 		KeyVaultName = $KeyVaultName
 		Location = $Location
 		NicName = $NicName
 		ResourceGroupName = $ResourceGroupName
+		SasToken = [bool]::Parse($SasToken)
 		ScriptUri = $ScriptUri
 		SubnetName = $SubnetName
 		TemplateSpecId = $TemplateSpecId
