@@ -14,14 +14,6 @@ Param(
 
     [parameter(Mandatory)]
     [string]
-    $KeyVaultName,
-
-    [parameter(Mandatory)]
-    [string]
-    $StorageAccountNames,
-
-    [parameter(Mandatory)]
-    [string]
     $StorageAccountSuffix,
 
     [parameter(Mandatory)]
@@ -92,17 +84,11 @@ try
 	$FilesSuffix = '.file.' + $StorageAccountSuffix
 	Write-Log -Message "Azure Files Suffix = $FilesSuffix" -Type 'INFO'
 
-    # Convert FileShareNames from a string array to a PowerShell array
-    $SharesStringArray = $FileShareNames.Replace("'",'"') | ConvertFrom-Json
-    $Shares = $SharesStringArray -split ','
+    # Convert FileShareResourceIds from a string array to a PowerShell array
+    $FileSharesStringArray = $FileShareResourceIds.Replace("'",'"') | ConvertFrom-Json
+    $PSFileSharesResourceIds = $FileSharesStringArray -split ','
     Write-Log -Message "File Shares:" -Type 'INFO'
     $Shares | Add-Content -Path 'C:\cse.txt' -Force
-
-    # Convert StorageAccountNames from a string array to a PowerShell array
-    $StorageAccountsStringArray = $StorageAccountNames.Replace("'",'"') | ConvertFrom-Json
-    $StorageAccounts = $StorageAccountsStringArray -split ','
-    Write-Log -Message "File Shares:" -Type 'INFO'
-    $StorageAccounts | Add-Content -Path 'C:\cse.txt' -Force
 
 
 	##############################################################
@@ -120,21 +106,21 @@ try
         Write-Log -Message "NuGet Package Provider already exists" -Type 'INFO'    
     }
     
-    # Install required Az.KeyVault module
-    $AzKeyVaultModule = Get-Module -ListAvailable | Where-Object {$_.Name -eq 'Az.KeyVault'}
-    if(!$AzKeyVaultModule)
+    # Install required Az.Storage module
+    $AzStorageModule = Get-Module -ListAvailable | Where-Object {$_.Name -eq 'Az.Storage'}
+    if(!$AzStorageModule)
     {
-        Install-Module -Name 'Az.KeyVault' -Repository 'PSGallery' -Force
-        Write-Log -Message "Installed the Az.KeyVault module successfully" -Type 'INFO'
+        Install-Module -Name 'Az.Storage' -Repository 'PSGallery' -Force
+        Write-Log -Message "Installed the Az.Storage module successfully" -Type 'INFO'
     }
     else 
     {
-        Write-Log -Message "Az.KeyVault module already exists" -Type 'INFO'
+        Write-Log -Message "Az.Storage module already exists" -Type 'INFO'
     }
 
 	# Download the tool
 	$URL = 'https://github.com/FSLogix/Invoke-FslShrinkDisk/archive/refs/heads/master.zip'
-	$ZIP = 'fds.zip'
+	$ZIP = 'fsd.zip'
 	Invoke-WebRequest -Uri $URL -OutFile $ZIP
 	Write-Log -Message 'Downloaded the tool successfully' -Type 'INFO'
 
@@ -147,36 +133,34 @@ try
     ##############################################################
     #  Process File Shares
 	##############################################################
-    foreach($StorageAccount in $StorageAccounts)
+    foreach($FileShareResourceId in $PSFileSharesResourceIds)
     {
+        $StorageAccount = $FileShareResourceId.Split('/')[8]
+        $Share = $FileShareResourceId.Split('/')[12]
         $FileServer = '\\' + $StorageAccount + $FilesSuffix
 
         # Get the storage account key
         Connect-AzAccount -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId -Identity -AccountId $UserAssignedIdentityClientId
-        $StorageAccountKey = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $StorageAccount).SecretValue
-        Write-Log -Message "Acquired the Storage Account key for $StorageAccountName from the Key Vault successfully" -Type 'INFO'
+        $StorageAccountKey = ConvertTo-SecureString -String $((Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName)[0].Value) -AsPlainText -Force
+        Write-Log -Message "Acquired the Storage Account key for $StorageAccountName" -Type 'INFO'
 
         # Create credential for accessing the storage account
         $Username = 'Azure\' + $StorageAccount
         [pscredential]$Credential = New-Object System.Management.Automation.PSCredential ($Username, $StorageAccountKey)
 
-        
-        foreach($Share in $Shares)
-        {
-            # Mount file share
-            $FileShare = $FileServer + '\' + $Share
-            New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $Credential
-            Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
+        # Mount file share
+        $FileShare = $FileServer + '\' + $Share
+        New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $Credential
+        Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 
-            # Run the tool
-            & .\fds\Invoke-FslShrinkDisk-master\Invoke-FslShrinkDisk.ps1 -Path $FileShare -Recurse -IgnoreLessThanGB 30 -DeleteOlderThanDays $DeleteOlderThanDays
-            Write-Log -Message 'Ran the tool successfully' -Type 'INFO'
+        # Run the tool
+        & .\fsd\Invoke-FslShrinkDisk-master\Invoke-FslShrinkDisk.ps1 -Path $FileShare -Recurse -IgnoreLessThanGB 1000 -DeleteOlderThanDays $DeleteOlderThanDays
+        Write-Log -Message 'Ran the tool successfully' -Type 'INFO'
 
-            # Unmount file share
-            Remove-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Force
-            Start-Sleep -Seconds 5
-            Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
-        }
+        # Unmount file share
+        Remove-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Force
+        Start-Sleep -Seconds 5
+        Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
     }
 }
 catch 

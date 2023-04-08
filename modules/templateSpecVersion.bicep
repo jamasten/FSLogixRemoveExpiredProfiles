@@ -29,7 +29,6 @@ module virtualMachine 'virtualMachine.bicep' = {
     DiskName: DiskName
     FileShareResourceIds: FileShareResourceIds
     HybridUseBenefit: HybridUseBenefit
-    KeyVaultName: KeyVaultName
     Location: Location
     NicName: NicName
     ScriptUri: ScriptUri

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "14072102559646155909"
+      "templateHash": "14040666679674572247"
     }
   },
   "parameters": {
@@ -37,7 +37,8 @@
       "type": "string"
     },
     "Tags": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "Timestamp": {
       "type": "string",
@@ -92,9 +93,6 @@
           },
           "HybridUseBenefit": {
             "value": "[parameters('HybridUseBenefit')]"
-          },
-          "KeyVaultName": {
-            "value": "[parameters('KeyVaultName')]"
           },
           "Location": {
             "value": "[parameters('Location')]"
@@ -156,7 +154,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "4096362347607764829"
+              "templateHash": "13568186833976123806"
             }
           },
           "parameters": {
@@ -171,9 +169,6 @@
             },
             "HybridUseBenefit": {
               "type": "bool"
-            },
-            "KeyVaultName": {
-              "type": "string"
             },
             "Location": {
               "type": "string"
@@ -334,7 +329,7 @@
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -KeyVaultName {3} -StorageAccountSuffix {4} -SubscriptionId {5} -TenantId {6} -UserAssignedIdentityClientId {7}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), parameters('KeyVaultName'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                 }
               },
               "dependsOn": [
