@@ -13,7 +13,7 @@ param(
 	$EnvironmentName,
 
 	[Parameter(Mandatory)]
-	[string]
+	[array]
 	$FileShareResourceIds,
 
 	[Parameter(Mandatory)]
@@ -98,7 +98,7 @@ try
 	$Params = @{		
 		DeleteOlderThanDays = $DeleteOlderThanDays.ToInt32()
 		DiskName = $DiskName
-		FileShareResourceIds = $FileShareResourceIds | ConvertFrom-Json
+		FileShareResourceIds = $FileShareResourceIds
 		HybridUseBenefit = $HybridUseBenefit.ToBoolean()
 		KeyVaultName = $KeyVaultName
 		Location = $Location
