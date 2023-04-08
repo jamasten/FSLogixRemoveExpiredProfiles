@@ -128,7 +128,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareResourceIds ${FileShareResourceIds} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareResourceIds ${FileShareResourceIds} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
     }
   }
 }

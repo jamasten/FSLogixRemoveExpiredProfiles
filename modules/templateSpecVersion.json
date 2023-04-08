@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "8403086646255997748"
+      "templateHash": "10903440207222477011"
     }
   },
   "parameters": {
@@ -150,7 +150,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "9879382867219638016"
+              "templateHash": "15744933279881007180"
             }
           },
           "parameters": {
@@ -325,7 +325,7 @@
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Set-FslogixDiskSize.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                 }
               },
               "dependsOn": [
