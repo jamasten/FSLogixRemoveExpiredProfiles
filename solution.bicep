@@ -9,7 +9,7 @@ param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/FS
 param _artifactsLocationSasToken string = ''
 
 @description('The amount of days to keep an unused FSLogix profile before deleting it.')
-param DeleteOlderThanDays int
+param DeleteOlderThanDays int = 1
 
 @allowed([
   'd' // Development
@@ -21,7 +21,9 @@ param DeleteOlderThanDays int
 param Environment string = 'd'
 
 @description('The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers.')
-param FileShareResourceIds array
+param FileShareResourceIds array = [
+  '/subscriptions/3764b123-4849-4395-8e6e-ca6d68d8d4b4/resourceGroups/rg-core-d-eu/providers/Microsoft.Storage/storageAccounts/sacoredeu/files/default/shares/profile-containers'
+]
 
 @allowed([
   'Day'
@@ -29,7 +31,7 @@ param FileShareResourceIds array
   'Month'
 ])
 @description('The frequency in which to check for expired VHDs.')
-param Frequency string
+param Frequency string = 'Day'
 
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false
@@ -45,7 +47,7 @@ param Location string = deployment().location
 param LogAnalyticsWorkspaceResourceId string = ''
 
 @description('The subnet for the AVD session hosts.')
-param SubnetName string
+param SubnetName string = 'Clients'
 
 @description('Add key / value pairs to include metadata on the Azure resources.')
 param Tags object = {}
@@ -54,10 +56,10 @@ param Tags object = {}
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 
 @description('Virtual network for the virtual machine to run the tool.')
-param VirtualNetworkName string
+param VirtualNetworkName string = 'vnet-net-d-eu'
 
 @description('Virtual network resource group for the virtual machine to run the tool.')
-param VirtualNetworkResourceGroupName string
+param VirtualNetworkResourceGroupName string = 'rg-net-d-eu'
 
 @secure()
 @description('The local administrator password for the virtual machine.')
