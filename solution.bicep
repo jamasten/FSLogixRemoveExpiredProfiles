@@ -211,7 +211,7 @@ var VmName = 'vm-${NamingStandard}'
 resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
   name: guid(subscription().id, 'CaseWorkerDeploy')
   properties: {
-    roleName: 'KeyVaultDeploy_${subscription().id}'
+    roleName: 'KeyVaultDeployAction_${subscription().subscriptionId}'
     description: 'Allows a principal to get but not view Key Vault secrets for an ARM template deployment.'
     assignableScopes: [
       subscription().id
