@@ -112,7 +112,7 @@ try
 		-TemplateSpecId $TemplateSpecId `
 		-DeleteOlderThanDays $([convert]::ToInt32($DeleteOlderThanDays, 10)) `
 		-DiskName $DiskName `
-		-FileShareResourceIds $FileShareResourceIds -split ',' `
+		-FileShareResourceIds $FileShareResourceIds.Split(',') `
 		-HybridUseBenefit $([bool]::Parse($HybridUseBenefit)) `
 		-KeyVaultName $KeyVaultName `
 		-NicName $NicName `
