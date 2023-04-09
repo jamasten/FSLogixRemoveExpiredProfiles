@@ -1,8 +1,8 @@
-param SasToken string
+param AutomationAccountPrincipalId string
 param KeyVaultName string
 param Location string
 param RoleDefinitionId string
-param UserAssignedIdentityPrincipalId string
+param SasToken string
 @secure()
 param VmPassword string
 @secure()
@@ -56,13 +56,13 @@ resource secret_VmUsername 'Microsoft.KeyVault/vaults/secrets@2021-10-01' = {
   }
 }
 
-// Gives the User Assigned Identity rights to get key vault secrets
+// Gives the Managed Identity on the Automation Account rights to get key vault secrets in deployments
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
-  name: guid(UserAssignedIdentityPrincipalId, RoleDefinitionId, resourceGroup().id)
+  name: guid(AutomationAccountPrincipalId, RoleDefinitionId, resourceGroup().id)
   scope: keyVault
   properties: {
     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionId)
-    principalId: UserAssignedIdentityPrincipalId
+    principalId: AutomationAccountPrincipalId
     principalType: 'ServicePrincipal'
   }
 }

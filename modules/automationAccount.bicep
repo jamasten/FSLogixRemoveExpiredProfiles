@@ -157,3 +157,5 @@ resource roleAssignment_ManagedIdentityOperator 'Microsoft.Authorization/roleAss
     principalType: 'ServicePrincipal'
   }
 }
+
+output PrincipalId string = automationAccount.identity.principalId

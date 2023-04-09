@@ -290,11 +290,11 @@ module keyVault 'modules/keyVault.bicep' = {
   scope: rg
   name: 'KeyVault_${Timestamp}'
   params: {
+    AutomationAccountPrincipalId: automationAccount.outputs.PrincipalId
     KeyVaultName: KeyVaultName
     Location: Location
     RoleDefinitionId: roleDefinition.name
     SasToken: _artifactsLocationSasToken
-    UserAssignedIdentityPrincipalId: userAssignedIdentity.outputs.PrincipalId
     VmPassword: VmPassword
     VmUsername: VmUsername
   }

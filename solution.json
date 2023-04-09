@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "1906776180223704183"
+      "templateHash": "10525579634187705780"
     }
   },
   "parameters": {
@@ -887,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "3439346324135448052"
+              "templateHash": "10182742333420996981"
             }
           },
           "parameters": {
@@ -1177,7 +1177,13 @@
                 "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
               ]
             }
-          ]
+          ],
+          "outputs": {
+            "PrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2021-06-22', 'full').identity.principalId]"
+            }
+          }
         }
       },
       "dependsOn": [
@@ -1197,6 +1203,9 @@
         },
         "mode": "Incremental",
         "parameters": {
+          "AutomationAccountPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+          },
           "KeyVaultName": {
             "value": "[variables('KeyVaultName')]"
           },
@@ -1208,9 +1217,6 @@
           },
           "SasToken": {
             "value": "[parameters('_artifactsLocationSasToken')]"
-          },
-          "UserAssignedIdentityPrincipalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
           "VmPassword": {
             "value": "[parameters('VmPassword')]"
@@ -1226,11 +1232,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "6339928693897805253"
+              "templateHash": "1528713095736407423"
             }
           },
           "parameters": {
-            "SasToken": {
+            "AutomationAccountPrincipalId": {
               "type": "string"
             },
             "KeyVaultName": {
@@ -1242,7 +1248,7 @@
             "RoleDefinitionId": {
               "type": "string"
             },
-            "UserAssignedIdentityPrincipalId": {
+            "SasToken": {
               "type": "string"
             },
             "VmPassword": {
@@ -1310,10 +1316,10 @@
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2020-10-01-preview",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('KeyVaultName'))]",
-              "name": "[guid(parameters('UserAssignedIdentityPrincipalId'), parameters('RoleDefinitionId'), resourceGroup().id)]",
+              "name": "[guid(parameters('AutomationAccountPrincipalId'), parameters('RoleDefinitionId'), resourceGroup().id)]",
               "properties": {
                 "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
-                "principalId": "[parameters('UserAssignedIdentityPrincipalId')]",
+                "principalId": "[parameters('AutomationAccountPrincipalId')]",
                 "principalType": "ServicePrincipal"
               },
               "dependsOn": [
@@ -1324,9 +1330,9 @@
         }
       },
       "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp')))]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
-        "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(subscription().id, 'CaseWorkerDeploy'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
+        "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(subscription().id, 'CaseWorkerDeploy'))]"
       ]
     },
     {
