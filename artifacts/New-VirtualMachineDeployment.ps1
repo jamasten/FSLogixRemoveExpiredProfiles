@@ -91,16 +91,9 @@ try
 {
 	# Import required modules
 	Import-Module -Name 'Az.Accounts'
-	Import-Module -Name 'Az.KeyVault'
+	Import-Module -Name 'Az.Compute'
 	Import-Module -Name 'Az.Resources'
 	Write-Output 'Imported modules successfully'
-
-	# Add conditional params
-	if(!($Tags -eq 'None'))
-	{
-		$Tags = $Tags | ConvertFrom-Json
-		$Params.Add('Tags', $Tags)
-	}
 
 	# Connect to Azure
 	Connect-AzAccount -Environment $EnvironmentName -Tenant $TenantId -Subscription $SubscriptionId -Identity | Out-Null
@@ -119,6 +112,7 @@ try
 		-SasToken $([bool]::Parse($SasToken)) `
 		-ScriptUri $ScriptUri `
 		-SubnetName $SubnetName `
+		-Tags $(if(!($Tags -eq 'None')){$Tags | ConvertFrom-Json}else{@{}}) `
 		-UserAssignedIdentityClientId $UserAssignedIdentityClientId `
 		-UserAssignedIdentityResourceId $UserAssignedIdentityResourceId `
 		-VirtualNetworkName $VirtualNetworkName `
