@@ -146,7 +146,7 @@ try
         Write-Log -Message "Acquired the Storage Account key for $StorageAccountName" -Type 'INFO'
 
         # Create credential for accessing the storage account
-        $Username = 'Azure\' + $StorageAccount
+        $Username = 'Azure\' + $StorageAccountName
         [pscredential]$Credential = New-Object System.Management.Automation.PSCredential ($Username, $StorageAccountKey)
 
         # Mount file share
