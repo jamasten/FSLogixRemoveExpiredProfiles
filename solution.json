@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "15242573251852090328"
+      "templateHash": "18027062007503355551"
     }
   },
   "parameters": {
@@ -213,7 +213,6 @@
       "[parameters('VirtualNetworkResourceGroupName')]"
     ],
     "RoleDefinitionIds": {
-      "KeyVaultSecretsUser": "4633458b-17de-408a-b874-0445c86b69e6",
       "ManagedIdentityOperator": "f1a07417-d97a-45cb-824c-7a7467783830",
       "Reader": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
       "ReaderAndDataAccess": "c12c1c16-33a1-487b-954d-41c89c60f349",
