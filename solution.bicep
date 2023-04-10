@@ -26,12 +26,12 @@ param FileShareResourceIds array = [
 ]
 
 @allowed([
-  'Day'
-  'Week'
-  'Month'
+  'Daily'
+  'Weekly'
+  'Monthly'
 ])
 @description('The frequency in which to check for expired VHDs.')
-param Frequency string = 'Day'
+param Frequency string = 'Daily'
 
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false

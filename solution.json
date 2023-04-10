@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "10525579634187705780"
+      "templateHash": "15242573251852090328"
     }
   },
   "parameters": {
@@ -54,14 +54,14 @@
     },
     "Frequency": {
       "type": "string",
-      "defaultValue": "Day",
+      "defaultValue": "Daily",
       "metadata": {
         "description": "The frequency in which to check for expired VHDs."
       },
       "allowedValues": [
-        "Day",
-        "Week",
-        "Month"
+        "Daily",
+        "Weekly",
+        "Monthly"
       ]
     },
     "HybridUseBenefit": {
@@ -887,7 +887,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "10182742333420996981"
+              "templateHash": "18240301204670357189"
             }
           },
           "parameters": {
@@ -1018,10 +1018,11 @@
               "apiVersion": "2022-08-08",
               "name": "[format('{0}/{1}', parameters('AutomationAccountName'), format('{0}_{1}', parameters('RunbookName'), parameters('Frequency')))]",
               "properties": {
-                "frequency": "Day",
+                "frequency": "[if(equals(parameters('Frequency'), 'Monthly'), 'Month', if(equals(parameters('Frequency'), 'Weekly'), 'Week', 'Day'))]",
                 "interval": 1,
                 "startTime": "[dateTimeAdd(parameters('Time'), 'PT15M')]",
-                "timeZone": "[parameters('TimeZone')]"
+                "timeZone": "[parameters('TimeZone')]",
+                "advancedSchedule": "[if(equals(parameters('Frequency'), 'Monthly'), createObject('monthlyOccurrences', createArray(createObject('day', 'Saturday', 'occurrence', -1))), if(equals(parameters('Frequency'), 'Weekly'), createObject('weekDays', createArray('Saturday')), null()))]"
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"

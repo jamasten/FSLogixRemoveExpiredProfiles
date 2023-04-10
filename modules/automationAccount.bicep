@@ -65,10 +65,22 @@ resource schedule 'Microsoft.Automation/automationAccounts/schedules@2022-08-08'
   parent: automationAccount
   name: '${RunbookName}_${Frequency}'
   properties: {
-    frequency: 'Day'
+    frequency: Frequency == 'Monthly' ? 'Month' : Frequency == 'Weekly' ? 'Week' : 'Day'
     interval: 1
     startTime: dateTimeAdd(Time, 'PT15M')
     timeZone: TimeZone
+    advancedSchedule: Frequency == 'Monthly' ? {
+      monthlyOccurrences: [
+        {
+          day: 'Saturday'
+          occurrence: -1
+        }
+      ]
+    } : Frequency == 'Weekly' ? {
+      weekDays: [
+        'Saturday'
+      ]
+    } : null
   }
 }
 
