@@ -428,7 +428,7 @@
                 "AutomationAccountName": "[steps('basics').names.automationAccount]",
                 "DeleteOlderThanDays": "[steps('automation').days]",
                 "DiskName": "[steps('basics').names.disk]",
-                "FileShareResourceId": "[steps('fileShare').fileShareSelection.id]",
+                "FileShareResourceId": "[steps('fileShare').fileShareSelection]",
                 "Frequency": "[steps('automation').frequency]",
                 "HybridUseBenefit": "[steps('virtualMachine').hybridUseBenefit]",
                 "KeyVaultName": "[steps('basics').names.keyVault]",
