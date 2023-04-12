@@ -442,7 +442,7 @@
                 "VirtualNetworkName": "[steps('virtualMachine').network.virtualNetwork.name]",
                 "VirtualNetworkResourceGroupName": "[first(skip(split(steps('virtualMachine').network.virtualNetwork.id, '/'), 4))]",
                 "VmName": "[steps('basics').names.virtualMachine]",
-                "VmPassword": "[steps('virtualMachine').credentials.password]",
+                "VmPassword": "[steps('virtualMachine').credentials.password.password]",
                 "VmSize": "[steps('virtualMachine').size]",
                 "VmUsername": "[steps('virtualMachine').credentials.username]"
             },
