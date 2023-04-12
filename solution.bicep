@@ -46,7 +46,7 @@ param NicName string = 'nic-fslogix-mgmt'
 @description('The name of the Azure resource group.')
 param ResourceGroupName string = 'rg-fslogix-mgmt'
 
-@description('The subnet for the AVD session hosts.')
+@description('The name of the subnet for the virtual machine.')
 param SubnetName string
 
 @description('Add key / value pairs to include metadata on the Azure resources.')
@@ -61,10 +61,10 @@ param Timestamp string = utcNow('yyyyMMddhhmmss')
 @description('The name of the Azure user assigned managed identity.')
 param UserAssignedIdentityName string = 'uai-fslogix-mgmt'
 
-@description('Virtual network for the virtual machine to run the tool.')
+@description('The name of the virtual network for the virtual machine NIC.')
 param VirtualNetworkName string
 
-@description('Virtual network resource group for the virtual machine to run the tool.')
+@description('The name of the resource group for the virtual network.')
 param VirtualNetworkResourceGroupName string
 
 @description('The name of the Azure virtual machine.')
