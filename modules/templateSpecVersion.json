@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.16.1.55165",
-      "templateHash": "8456199519922556835"
+      "version": "0.16.2.56959",
+      "templateHash": "10293200130020812465"
     }
   },
   "parameters": {
@@ -150,8 +150,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "17629234333186626641"
+              "version": "0.16.2.56959",
+              "templateHash": "8031198750288228536"
             }
           },
           "parameters": {
@@ -321,12 +321,12 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[format('{0}Remove-ExpiredFslogixDisks.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
+                    "[format('{0}Remove-ExpiredFslogixContainers.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixContainers.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                 }
               },
               "dependsOn": [

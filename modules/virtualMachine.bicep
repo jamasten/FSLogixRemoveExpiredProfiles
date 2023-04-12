@@ -123,12 +123,12 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        '${ScriptUri}Remove-ExpiredFslogixDisks.ps1${SasToken}'
+        '${ScriptUri}Remove-ExpiredFslogixContainers.ps1${SasToken}'
       ]
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareResourceId ${FileShareResourceId} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixContainers.ps1 -DeleteOlderThanDays ${DeleteOlderThanDays} -Environment ${environment().name} -FileShareResourceId ${FileShareResourceId} -StorageAccountSuffix ${StorageAccountSuffix} -SubscriptionId ${subscription().subscriptionId} -TenantId ${subscription().tenantId} -UserAssignedIdentityClientId ${UserAssignedIdentityClientId}'
     }
   }
 }

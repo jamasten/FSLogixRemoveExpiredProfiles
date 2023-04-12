@@ -92,7 +92,7 @@ var RoleDefinitionIds = {
   ReaderAndDataAccess: 'c12c1c16-33a1-487b-954d-41c89c60f349'
   VirtualMachineContributor: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c'
 }
-var RunbookName = 'Remove-ExpiredFslogixDisks'
+var RunbookName = 'Remove-ExpiredFslogixContainers'
 var RunbookScriptName = 'New-VirtualMachineDeployment.ps1'
 var TimeZone = TimeZones[Location]
 var TimeZones = {

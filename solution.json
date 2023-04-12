@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "17278104118310648403"
+      "templateHash": "14853439493062242724"
     }
   },
   "parameters": {
@@ -188,7 +188,7 @@
       "ReaderAndDataAccess": "c12c1c16-33a1-487b-954d-41c89c60f349",
       "VirtualMachineContributor": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
     },
-    "RunbookName": "Remove-ExpiredFslogixDisks",
+    "RunbookName": "Remove-ExpiredFslogixContainers",
     "RunbookScriptName": "New-VirtualMachineDeployment.ps1",
     "TimeZone": "[variables('TimeZones')[parameters('Location')]]",
     "TimeZones": {
