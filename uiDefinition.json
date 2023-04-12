@@ -332,7 +332,7 @@
                                 {
                                     "name": "subnet",
                                     "type": "Microsoft.Common.DropDown",
-                                    "visible": "[equals(steps('aib').virtualNetwork, true)]",
+                                    "visible": true,
                                     "label": "Subnet",
                                     "defaultValue": "",
                                     "toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
