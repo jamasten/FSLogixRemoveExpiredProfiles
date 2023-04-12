@@ -9,8 +9,8 @@ Param(
     $Environment,
 
     [parameter(Mandatory)]
-    [array]
-    $FileShareResourceIds,
+    [string]
+    $FileShareResourceId,
 
     [parameter(Mandatory)]
     [string]
@@ -84,12 +84,6 @@ try
 	$FilesSuffix = '.file.' + $StorageAccountSuffix
 	Write-Log -Message "Azure Files Suffix = $FilesSuffix" -Type 'INFO'
 
-    # Convert FileShareResourceIds from a string array to a PowerShell array
-    $FileSharesStringArray = $FileShareResourceIds.Replace("'",'"') | ConvertFrom-Json
-    $PSFileSharesResourceIds = $FileSharesStringArray -split ','
-    Write-Log -Message "File Shares:" -Type 'INFO'
-    $Shares | Add-Content -Path 'C:\cse.txt' -Force
-
 
 	##############################################################
     #  Install Prerequisites
@@ -131,38 +125,36 @@ try
 
 
     ##############################################################
-    #  Process File Shares
+    #  Process File Share
 	##############################################################
-    foreach($FileShareResourceId in $PSFileSharesResourceIds)
-    {
-        $StorageAccountResourceGroupName = $FileShareResourceId.Split('/')[4]
-        $StorageAccountName = $FileShareResourceId.Split('/')[8]
-        $Share = $FileShareResourceId.Split('/')[12]
-        $FileServer = '\\' + $StorageAccountName + $FilesSuffix
 
-        # Get the storage account key
-        Connect-AzAccount -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId -Identity -AccountId $UserAssignedIdentityClientId
-        $StorageAccountKey = ConvertTo-SecureString -String $((Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName)[0].Value) -AsPlainText -Force
-        Write-Log -Message "Acquired the Storage Account key for $StorageAccountName" -Type 'INFO'
+    $StorageAccountResourceGroupName = $FileShareResourceId.Split('/')[4]
+    $StorageAccountName = $FileShareResourceId.Split('/')[8]
+    $Share = $FileShareResourceId.Split('/')[12]
+    $FileServer = '\\' + $StorageAccountName + $FilesSuffix
 
-        # Create credential for accessing the storage account
-        $Username = 'Azure\' + $StorageAccountName
-        [pscredential]$Credential = New-Object System.Management.Automation.PSCredential ($Username, $StorageAccountKey)
+    # Get the storage account key
+    Connect-AzAccount -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId -Identity -AccountId $UserAssignedIdentityClientId
+    $StorageAccountKey = ConvertTo-SecureString -String $((Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName)[0].Value) -AsPlainText -Force
+    Write-Log -Message "Acquired the Storage Account key for $StorageAccountName" -Type 'INFO'
 
-        # Mount file share
-        $FileShare = $FileServer + '\' + $Share
-        New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $Credential
-        Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
+    # Create credential for accessing the storage account
+    $Username = 'Azure\' + $StorageAccountName
+    [pscredential]$Credential = New-Object System.Management.Automation.PSCredential ($Username, $StorageAccountKey)
 
-        # Run the tool
-        & .\fsd\Invoke-FslShrinkDisk-master\Invoke-FslShrinkDisk.ps1 -Path $FileShare -Recurse -IgnoreLessThanGB 1000 -DeleteOlderThanDays $DeleteOlderThanDays
-        Write-Log -Message 'Ran the tool successfully' -Type 'INFO'
+    # Mount file share
+    $FileShare = $FileServer + '\' + $Share
+    New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $Credential
+    Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 
-        # Unmount file share
-        Remove-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Force
-        Start-Sleep -Seconds 5
-        Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
-    }
+    # Run the tool
+    & .\fsd\Invoke-FslShrinkDisk-master\Invoke-FslShrinkDisk.ps1 -Path $FileShare -Recurse -IgnoreLessThanGB 1000 -DeleteOlderThanDays $DeleteOlderThanDays
+    Write-Log -Message 'Ran the tool successfully' -Type 'INFO'
+
+    # Unmount file share
+    Remove-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Force
+    Start-Sleep -Seconds 5
+    Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 }
 catch 
 {

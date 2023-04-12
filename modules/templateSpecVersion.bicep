@@ -1,6 +1,6 @@
 param DeleteOlderThanDays int
 param DiskName string
-param FileShareResourceIds array
+param FileShareResourceId string
 param HybridUseBenefit bool
 param KeyVaultName string
 param Location string = resourceGroup().location
@@ -28,7 +28,7 @@ module virtualMachine 'virtualMachine.bicep' = {
     SasToken: SasToken ? keyVault.getSecret('SasToken') : ''
     DeleteOlderThanDays: DeleteOlderThanDays
     DiskName: DiskName
-    FileShareResourceIds: FileShareResourceIds
+    FileShareResourceId: FileShareResourceId
     HybridUseBenefit: HybridUseBenefit
     Location: Location
     NicName: NicName

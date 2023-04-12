@@ -14,7 +14,7 @@ param(
 
 	[Parameter(Mandatory)]
 	[string]
-	$FileShareResourceIds,
+	$FileShareResourceId,
 
 	[Parameter(Mandatory)]
 	[string]
@@ -105,7 +105,7 @@ try
 		-TemplateSpecId $TemplateSpecId `
 		-DeleteOlderThanDays $([convert]::ToInt32($DeleteOlderThanDays, 10)) `
 		-DiskName $DiskName `
-		-FileShareResourceIds $FileShareResourceIds.Split(',') `
+		-FileShareResourceId $FileShareResourceId `
 		-HybridUseBenefit $([bool]::Parse($HybridUseBenefit)) `
 		-KeyVaultName $KeyVaultName `
 		-NicName $NicName `

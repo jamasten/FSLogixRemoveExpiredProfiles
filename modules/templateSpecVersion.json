@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "8731387486089427262"
+      "templateHash": "8456199519922556835"
     }
   },
   "parameters": {
@@ -15,8 +15,8 @@
     "DiskName": {
       "type": "string"
     },
-    "FileShareResourceIds": {
-      "type": "array"
+    "FileShareResourceId": {
+      "type": "string"
     },
     "HybridUseBenefit": {
       "type": "bool"
@@ -85,8 +85,8 @@
           "DiskName": {
             "value": "[parameters('DiskName')]"
           },
-          "FileShareResourceIds": {
-            "value": "[parameters('FileShareResourceIds')]"
+          "FileShareResourceId": {
+            "value": "[parameters('FileShareResourceId')]"
           },
           "HybridUseBenefit": {
             "value": "[parameters('HybridUseBenefit')]"
@@ -151,7 +151,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "15744933279881007180"
+              "templateHash": "17629234333186626641"
             }
           },
           "parameters": {
@@ -161,8 +161,8 @@
             "DiskName": {
               "type": "string"
             },
-            "FileShareResourceIds": {
-              "type": "array"
+            "FileShareResourceId": {
+              "type": "string"
             },
             "HybridUseBenefit": {
               "type": "bool"
@@ -326,7 +326,7 @@
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                 }
               },
               "dependsOn": [

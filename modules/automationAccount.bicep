@@ -4,7 +4,7 @@ param _artifactsLocationSasToken string
 param AutomationAccountName string
 param DeleteOlderThanDays int
 param DiskName string
-param FileShareResourceIds array
+param FileShareResourceId string
 param Frequency string
 param HybridUseBenefit bool
 param JobScheduleName string = newGuid()
@@ -93,7 +93,7 @@ resource jobSchedule 'Microsoft.Automation/automationAccounts/jobSchedules@2022-
       DeleteOlderThanDays: string(DeleteOlderThanDays)
       DiskName: DiskName
       EnvironmentName: environment().name
-      FileShareResourceIds: replace(replace(string(FileShareResourceIds), '[', ''), ']', '')
+      FileShareResourceId: FileShareResourceId
       HybridUseBenefit: string(HybridUseBenefit)
       KeyVaultName: KeyVaultName
       NicName: NicName

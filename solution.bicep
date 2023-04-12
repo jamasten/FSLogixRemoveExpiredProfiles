@@ -18,7 +18,7 @@ param DeleteOlderThanDays int = 1
 param DiskName string = 'disk-fslogix-mgmt'
 
 @description('The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers.')
-param FileShareResourceIds array
+param FileShareResourceId string
 
 @allowed([
   'Daily'
@@ -208,7 +208,7 @@ module automationAccount 'modules/automationAccount.bicep' = {
     AutomationAccountName: AutomationAccountName
     DeleteOlderThanDays: DeleteOlderThanDays
     DiskName: DiskName
-    FileShareResourceIds: FileShareResourceIds
+    FileShareResourceId: FileShareResourceId
     Frequency: Frequency
     HybridUseBenefit: HybridUseBenefit
     KeyVaultName: KeyVaultName
@@ -246,12 +246,11 @@ module keyVault 'modules/keyVault.bicep' = {
   }
 }
 
-@batchSize(1)
-module storageRoleAssignments 'modules/roleAssignments.bicep' = [for i in range(0, length(FileShareResourceIds)): {
-  scope: resourceGroup(split(FileShareResourceIds[i], '/')[4])
-  name: 'RoleAssignment_${i}_${split(FileShareResourceIds[i], '/')[4]}'
+module storageRoleAssignments 'modules/roleAssignments.bicep' = {
+  scope: resourceGroup(split(FileShareResourceId, '/')[4])
+  name: 'RoleAssignment_${split(FileShareResourceId, '/')[4]}'
   params: {
     PrincipalId: userAssignedIdentity.outputs.PrincipalId
     RoleDefinitionId: RoleDefinitionIds.ReaderAndDataAccess
   }
-}]
+}

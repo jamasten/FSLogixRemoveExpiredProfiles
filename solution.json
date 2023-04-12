@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "6214242835626068191"
+      "templateHash": "1356725422016605653"
     }
   },
   "parameters": {
@@ -44,8 +44,8 @@
         "description": "The name of the managed disk on the Azure virtual machine"
       }
     },
-    "FileShareResourceIds": {
-      "type": "array",
+    "FileShareResourceId": {
+      "type": "string",
       "metadata": {
         "description": "The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers."
       }
@@ -782,8 +782,8 @@
           "DiskName": {
             "value": "[parameters('DiskName')]"
           },
-          "FileShareResourceIds": {
-            "value": "[parameters('FileShareResourceIds')]"
+          "FileShareResourceId": {
+            "value": "[parameters('FileShareResourceId')]"
           },
           "Frequency": {
             "value": "[parameters('Frequency')]"
@@ -853,7 +853,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.1.55165",
-              "templateHash": "18240301204670357189"
+              "templateHash": "5937121850418991194"
             }
           },
           "parameters": {
@@ -872,8 +872,8 @@
             "DiskName": {
               "type": "string"
             },
-            "FileShareResourceIds": {
-              "type": "array"
+            "FileShareResourceId": {
+              "type": "string"
             },
             "Frequency": {
               "type": "string"
@@ -1003,7 +1003,7 @@
                   "DeleteOlderThanDays": "[string(parameters('DeleteOlderThanDays'))]",
                   "DiskName": "[parameters('DiskName')]",
                   "EnvironmentName": "[environment().name]",
-                  "FileShareResourceIds": "[replace(replace(string(parameters('FileShareResourceIds')), '[', ''), ']', '')]",
+                  "FileShareResourceId": "[parameters('FileShareResourceId')]",
                   "HybridUseBenefit": "[string(parameters('HybridUseBenefit'))]",
                   "KeyVaultName": "[parameters('KeyVaultName')]",
                   "NicName": "[parameters('NicName')]",
@@ -1303,16 +1303,10 @@
       ]
     },
     {
-      "copy": {
-        "name": "storageRoleAssignments",
-        "count": "[length(range(0, length(parameters('FileShareResourceIds'))))]",
-        "mode": "serial",
-        "batchSize": 1
-      },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('RoleAssignment_{0}_{1}', range(0, length(parameters('FileShareResourceIds')))[copyIndex()], split(parameters('FileShareResourceIds')[range(0, length(parameters('FileShareResourceIds')))[copyIndex()]], '/')[4])]",
-      "resourceGroup": "[split(parameters('FileShareResourceIds')[range(0, length(parameters('FileShareResourceIds')))[copyIndex()]], '/')[4]]",
+      "name": "[format('RoleAssignment_{0}', split(parameters('FileShareResourceId'), '/')[4])]",
+      "resourceGroup": "[split(parameters('FileShareResourceId'), '/')[4]]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
