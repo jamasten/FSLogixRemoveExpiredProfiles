@@ -3,7 +3,7 @@
     "view": {
         "kind": "Form",
         "properties": {
-            "title": "Remove Expired FSLogix Disks Solution",
+            "title": "Remove Expired FSLogix Containers Solution",
             "steps": [
                 {
                     "name": "basics",
@@ -172,7 +172,7 @@
                             "type": "Microsoft.Solutions.ArmApiControl",
                             "request": {
                                 "method": "GET",
-                                "path": "[concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/', first(skip(split(steps('basics').storageAccountSelection.id, '/'), 4)),'/providers/Microsoft.Storage/storageAccounts/', steps('basics').storageAccountSelection.name, '/fileServices/default/shares?api-version=2022-09-01')]"
+                                "path": "[concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/', first(skip(split(steps('fileShare').storageAccountSelection.id, '/'), 4)),'/providers/Microsoft.Storage/storageAccounts/', steps('fileShare').storageAccountSelection.name, '/fileServices/default/shares?api-version=2022-09-01')]"
                             }
                         },
                         {
@@ -184,7 +184,7 @@
                             "defaultValue": "",
                             "toolTip": "Select the file share to manage its quota.",
                             "constraints": {
-                                "allowedValues": "[map(steps('basics').fileShareApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+                                "allowedValues": "[map(steps('fileShare').fileShareApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
                                 "required": true
                             }
                         }
@@ -436,7 +436,7 @@
                 "NicName": "[steps('basics').names.nic]",
                 "ResourceGroupName": "[steps('basics').names.resourceGroup]",
                 "SubnetName": "[steps('virtualMachine').network.subnet]",
-                "Tags": "[replace(concat('{', map(steps('tags').customTags, (item) => parse(concat('\"', item.name, '\": \"', item.value, '\",'))), '}'), ',}', '}')]",
+                "Tags": "",
                 "TemplateSpecName": "[steps('basics').names.templateSpec]",
                 "UserAssignedIdentityName": "[steps('basics').names.userAssignedIdentity]",
                 "VirtualNetworkName": "[steps('virtualMachine').network.virtualNetwork.name]",
