@@ -8,22 +8,17 @@ param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/FS
 @description('The SAS Token for the scripts if they are stored on an Azure Storage Account.')
 param _artifactsLocationSasToken string = ''
 
+@description('The name of the Azure Automation account.')
+param AutomationAccountName string = 'aa-fslogix-mgmt'
+
 @description('The amount of days to keep an unused FSLogix profile before deleting it.')
 param DeleteOlderThanDays int = 1
 
-@allowed([
-  'd' // Development
-  'p' // Production
-  's' // Shared Services
-  't' // Test
-])
-@description('The environment short name used for naming resources in the solution.')
-param Environment string = 'd'
+@description('The name of the managed disk on the Azure virtual machine')
+param DiskName string = 'disk-fslogix-mgmt'
 
 @description('The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers.')
-param FileShareResourceIds array = [
-  '/subscriptions/3764b123-4849-4395-8e6e-ca6d68d8d4b4/resourceGroups/rg-core-d-eu/providers/Microsoft.Storage/storageAccounts/sacoredeu/files/default/shares/profile-containers'
-]
+param FileShareResourceIds array
 
 @allowed([
   'Daily'
@@ -36,8 +31,8 @@ param Frequency string = 'Daily'
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false
 
-@description('The unique identifier that describes the purpose of the Azure resource group and resources.')
-param Identifier string = 'fslogix'
+@description('The name of the Azure key vault.')
+param KeyVaultName string = 'kv-fslogix-mgmt'
 
 @description('The deployment location for the solution.')
 param Location string = deployment().location
@@ -45,20 +40,35 @@ param Location string = deployment().location
 @description('The resource ID for the Log Analytics Workspace to collect log data and send alerts.')
 param LogAnalyticsWorkspaceResourceId string = ''
 
+@description('The name of the network interface on the Azure virtual machine.')
+param NicName string = 'nic-fslogix-mgmt'
+
+@description('The name of the Azure resource group.')
+param ResourceGroupName string = 'rg-fslogix-mgmt'
+
 @description('The subnet for the AVD session hosts.')
-param SubnetName string = 'Clients'
+param SubnetName string
 
 @description('Add key / value pairs to include metadata on the Azure resources.')
 param Tags object = {}
 
+@description('The name of the Azure template spec.')
+param TemplateSpecName string = 'ts-fslogix-mgmt'
+
 @description('DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter.')
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 
+@description('The name of the Azure user assigned managed identity.')
+param UserAssignedIdentityName string = 'uai-fslogix-mgmt'
+
 @description('Virtual network for the virtual machine to run the tool.')
-param VirtualNetworkName string = 'vnet-net-d-eu'
+param VirtualNetworkName string
 
 @description('Virtual network resource group for the virtual machine to run the tool.')
-param VirtualNetworkResourceGroupName string = 'rg-net-d-eu'
+param VirtualNetworkResourceGroupName string
+
+@description('The name of the Azure virtual machine.')
+param VmName string = 'vm-fslogix-mgmt'
 
 @secure()
 @description('The local administrator password for the virtual machine.')
@@ -72,66 +82,6 @@ param VmSize string = 'Standard_D4ds_v5'
 param VmUsername string
 
 
-var AutomationAccountName = 'aa-${NamingStandard}'
-var DiskName = 'disk-${NamingStandard}'
-var KeyVaultName = 'kv-${NamingStandard}'
-var LocationShortName = LocationShortNames[Location]
-var LocationShortNames = {
-  australiacentral: 'ac'
-  australiacentral2: 'ac2'
-  australiaeast: 'ae'
-  australiasoutheast: 'as'
-  brazilsouth: 'bs2'
-  brazilsoutheast: 'bs'
-  canadacentral: 'cc'
-  canadaeast: 'ce'
-  centralindia: 'ci'
-  centralus: 'cu'
-  eastasia: 'ea'
-  eastus: 'eu'
-  eastus2: 'eu2'
-  francecentral: 'fc'
-  francesouth: 'fs'
-  germanynorth: 'gn'
-  germanywestcentral: 'gwc'
-  japaneast: 'je'
-  japanwest: 'jw'
-  jioindiacentral: 'jic'
-  jioindiawest: 'jiw'
-  koreacentral: 'kc'
-  koreasouth: 'ks'
-  northcentralus: 'ncu'
-  northeurope: 'ne'
-  norwayeast: 'ne2'
-  norwaywest: 'nw'
-  southafricanorth: 'san'
-  southafricawest: 'saw'
-  southcentralus: 'scu'
-  southeastasia: 'sa'
-  southindia: 'si'
-  swedencentral: 'sc'
-  switzerlandnorth: 'sn'
-  switzerlandwest: 'sw'
-  uaecentral: 'uc'
-  uaenorth: 'un'
-  uksouth: 'us'
-  ukwest: 'uw'
-  usdodcentral: 'uc'
-  usdodeast: 'ue'
-  usgovarizona: 'az'
-  usgoviowa: 'ia'
-  usgovtexas: 'tx'
-  usgovvirginia: 'va'
-  westcentralus: 'wcu'
-  westeurope: 'we'
-  westindia: 'wi'
-  westus: 'wu'
-  westus2: 'wu2'
-  westus3: 'wu3'
-}
-var NamingStandard = '${Identifier}-${Environment}-${LocationShortName}'
-var NicName = 'nic-${NamingStandard}'
-var ResourceGroupName = 'rg-${NamingStandard}'
 var RoleAssignmentResourceGroups = [
   ResourceGroupName
   VirtualNetworkResourceGroupName
@@ -144,7 +94,6 @@ var RoleDefinitionIds = {
 }
 var RunbookName = 'Remove-ExpiredFslogixDisks'
 var RunbookScriptName = 'New-VirtualMachineDeployment.ps1'
-var TemplateSpecName = 'ts-${NamingStandard}'
 var TimeZone = TimeZones[Location]
 var TimeZones = {
   australiacentral: 'AUS Eastern Standard Time'
@@ -203,8 +152,6 @@ var TimeZones = {
   westus2: 'Pacific Standard Time'
   westus3: 'Mountain Standard Time'
 }
-var UserAssignedIdentityName = 'uai-${NamingStandard}'
-var VmName = 'vm-${NamingStandard}'
 
 
 resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {

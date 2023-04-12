@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.1.55165",
-      "templateHash": "18027062007503355551"
+      "templateHash": "6214242835626068191"
     }
   },
   "parameters": {
@@ -23,6 +23,13 @@
         "description": "The SAS Token for the scripts if they are stored on an Azure Storage Account."
       }
     },
+    "AutomationAccountName": {
+      "type": "string",
+      "defaultValue": "aa-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the Azure Automation account."
+      }
+    },
     "DeleteOlderThanDays": {
       "type": "int",
       "defaultValue": 1,
@@ -30,24 +37,15 @@
         "description": "The amount of days to keep an unused FSLogix profile before deleting it."
       }
     },
-    "Environment": {
+    "DiskName": {
       "type": "string",
-      "defaultValue": "d",
+      "defaultValue": "disk-fslogix-mgmt",
       "metadata": {
-        "description": "The environment short name used for naming resources in the solution."
-      },
-      "allowedValues": [
-        "d",
-        "p",
-        "s",
-        "t"
-      ]
+        "description": "The name of the managed disk on the Azure virtual machine"
+      }
     },
     "FileShareResourceIds": {
       "type": "array",
-      "defaultValue": [
-        "/subscriptions/3764b123-4849-4395-8e6e-ca6d68d8d4b4/resourceGroups/rg-core-d-eu/providers/Microsoft.Storage/storageAccounts/sacoredeu/files/default/shares/profile-containers"
-      ],
       "metadata": {
         "description": "The resource IDs of the files shares containing the FSLogix profile and / or ODFC containers."
       }
@@ -71,11 +69,11 @@
         "description": "Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit"
       }
     },
-    "Identifier": {
+    "KeyVaultName": {
       "type": "string",
-      "defaultValue": "fslogix",
+      "defaultValue": "kv-fslogix-mgmt",
       "metadata": {
-        "description": "The unique identifier that describes the purpose of the Azure resource group and resources."
+        "description": "The name of the Azure key vault."
       }
     },
     "Location": {
@@ -92,9 +90,22 @@
         "description": "The resource ID for the Log Analytics Workspace to collect log data and send alerts."
       }
     },
+    "NicName": {
+      "type": "string",
+      "defaultValue": "nic-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the network interface on the Azure virtual machine."
+      }
+    },
+    "ResourceGroupName": {
+      "type": "string",
+      "defaultValue": "rg-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the Azure resource group."
+      }
+    },
     "SubnetName": {
       "type": "string",
-      "defaultValue": "Clients",
       "metadata": {
         "description": "The subnet for the AVD session hosts."
       }
@@ -106,6 +117,13 @@
         "description": "Add key / value pairs to include metadata on the Azure resources."
       }
     },
+    "TemplateSpecName": {
+      "type": "string",
+      "defaultValue": "ts-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the Azure template spec."
+      }
+    },
     "Timestamp": {
       "type": "string",
       "defaultValue": "[utcNow('yyyyMMddhhmmss')]",
@@ -113,18 +131,30 @@
         "description": "DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter."
       }
     },
+    "UserAssignedIdentityName": {
+      "type": "string",
+      "defaultValue": "uai-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the Azure user assigned managed identity."
+      }
+    },
     "VirtualNetworkName": {
       "type": "string",
-      "defaultValue": "vnet-net-d-eu",
       "metadata": {
         "description": "Virtual network for the virtual machine to run the tool."
       }
     },
     "VirtualNetworkResourceGroupName": {
       "type": "string",
-      "defaultValue": "rg-net-d-eu",
       "metadata": {
         "description": "Virtual network resource group for the virtual machine to run the tool."
+      }
+    },
+    "VmName": {
+      "type": "string",
+      "defaultValue": "vm-fslogix-mgmt",
+      "metadata": {
+        "description": "The name of the Azure virtual machine."
       }
     },
     "VmPassword": {
@@ -148,68 +178,8 @@
     }
   },
   "variables": {
-    "AutomationAccountName": "[format('aa-{0}', variables('NamingStandard'))]",
-    "DiskName": "[format('disk-{0}', variables('NamingStandard'))]",
-    "KeyVaultName": "[format('kv-{0}', variables('NamingStandard'))]",
-    "LocationShortName": "[variables('LocationShortNames')[parameters('Location')]]",
-    "LocationShortNames": {
-      "australiacentral": "ac",
-      "australiacentral2": "ac2",
-      "australiaeast": "ae",
-      "australiasoutheast": "as",
-      "brazilsouth": "bs2",
-      "brazilsoutheast": "bs",
-      "canadacentral": "cc",
-      "canadaeast": "ce",
-      "centralindia": "ci",
-      "centralus": "cu",
-      "eastasia": "ea",
-      "eastus": "eu",
-      "eastus2": "eu2",
-      "francecentral": "fc",
-      "francesouth": "fs",
-      "germanynorth": "gn",
-      "germanywestcentral": "gwc",
-      "japaneast": "je",
-      "japanwest": "jw",
-      "jioindiacentral": "jic",
-      "jioindiawest": "jiw",
-      "koreacentral": "kc",
-      "koreasouth": "ks",
-      "northcentralus": "ncu",
-      "northeurope": "ne",
-      "norwayeast": "ne2",
-      "norwaywest": "nw",
-      "southafricanorth": "san",
-      "southafricawest": "saw",
-      "southcentralus": "scu",
-      "southeastasia": "sa",
-      "southindia": "si",
-      "swedencentral": "sc",
-      "switzerlandnorth": "sn",
-      "switzerlandwest": "sw",
-      "uaecentral": "uc",
-      "uaenorth": "un",
-      "uksouth": "us",
-      "ukwest": "uw",
-      "usdodcentral": "uc",
-      "usdodeast": "ue",
-      "usgovarizona": "az",
-      "usgoviowa": "ia",
-      "usgovtexas": "tx",
-      "usgovvirginia": "va",
-      "westcentralus": "wcu",
-      "westeurope": "we",
-      "westindia": "wi",
-      "westus": "wu",
-      "westus2": "wu2",
-      "westus3": "wu3"
-    },
-    "NamingStandard": "[format('{0}-{1}-{2}', parameters('Identifier'), parameters('Environment'), variables('LocationShortName'))]",
-    "NicName": "[format('nic-{0}', variables('NamingStandard'))]",
-    "ResourceGroupName": "[format('rg-{0}', variables('NamingStandard'))]",
     "RoleAssignmentResourceGroups": [
-      "[variables('ResourceGroupName')]",
+      "[parameters('ResourceGroupName')]",
       "[parameters('VirtualNetworkResourceGroupName')]"
     ],
     "RoleDefinitionIds": {
@@ -220,7 +190,6 @@
     },
     "RunbookName": "Remove-ExpiredFslogixDisks",
     "RunbookScriptName": "New-VirtualMachineDeployment.ps1",
-    "TemplateSpecName": "[format('ts-{0}', variables('NamingStandard'))]",
     "TimeZone": "[variables('TimeZones')[parameters('Location')]]",
     "TimeZones": {
       "australiacentral": "AUS Eastern Standard Time",
@@ -278,9 +247,7 @@
       "westus": "Pacific Standard Time",
       "westus2": "Pacific Standard Time",
       "westus3": "Mountain Standard Time"
-    },
-    "UserAssignedIdentityName": "[format('uai-{0}', variables('NamingStandard'))]",
-    "VmName": "[format('vm-{0}', variables('NamingStandard'))]"
+    }
   },
   "resources": [
     {
@@ -305,7 +272,7 @@
     {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
-      "name": "[variables('ResourceGroupName')]",
+      "name": "[parameters('ResourceGroupName')]",
       "location": "[parameters('Location')]",
       "tags": "[parameters('Tags')]",
       "properties": {}
@@ -314,7 +281,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('UserAssignedIdentityName_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[variables('ResourceGroupName')]",
+      "resourceGroup": "[parameters('ResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -325,7 +292,7 @@
             "value": "[parameters('Location')]"
           },
           "UserAssignedIdentityName": {
-            "value": "[variables('UserAssignedIdentityName')]"
+            "value": "[parameters('UserAssignedIdentityName')]"
           }
         },
         "template": {
@@ -371,14 +338,14 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('TemplateSpec_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[variables('ResourceGroupName')]",
+      "resourceGroup": "[parameters('ResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -389,7 +356,7 @@
             "value": "[parameters('Location')]"
           },
           "TemplateSpecName": {
-            "value": "[variables('TemplateSpecName')]"
+            "value": "[parameters('TemplateSpecName')]"
           }
         },
         "template": {
@@ -786,14 +753,14 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('AutomationAccount_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[variables('ResourceGroupName')]",
+      "resourceGroup": "[parameters('ResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -807,13 +774,13 @@
             "value": "[parameters('_artifactsLocationSasToken')]"
           },
           "AutomationAccountName": {
-            "value": "[variables('AutomationAccountName')]"
+            "value": "[parameters('AutomationAccountName')]"
           },
           "DeleteOlderThanDays": {
             "value": "[parameters('DeleteOlderThanDays')]"
           },
           "DiskName": {
-            "value": "[variables('DiskName')]"
+            "value": "[parameters('DiskName')]"
           },
           "FileShareResourceIds": {
             "value": "[parameters('FileShareResourceIds')]"
@@ -825,7 +792,7 @@
             "value": "[parameters('HybridUseBenefit')]"
           },
           "KeyVaultName": {
-            "value": "[variables('KeyVaultName')]"
+            "value": "[parameters('KeyVaultName')]"
           },
           "Location": {
             "value": "[parameters('Location')]"
@@ -834,7 +801,7 @@
             "value": "[parameters('LogAnalyticsWorkspaceResourceId')]"
           },
           "NicName": {
-            "value": "[variables('NicName')]"
+            "value": "[parameters('NicName')]"
           },
           "RoleAssignmentResourceGroups": {
             "value": "[variables('RoleAssignmentResourceGroups')]"
@@ -855,16 +822,16 @@
             "value": "[parameters('Tags')]"
           },
           "TemplateSpecVersionResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp'))), '2022-09-01').outputs.VersionResourceId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp'))), '2022-09-01').outputs.VersionResourceId.value]"
           },
           "TimeZone": {
             "value": "[variables('TimeZone')]"
           },
           "UserAssignedIdentityClientId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ClientId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ClientId.value]"
           },
           "UserAssignedIdentityResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.ResourceId.value]"
           },
           "VirtualNetworkName": {
             "value": "[parameters('VirtualNetworkName')]"
@@ -873,7 +840,7 @@
             "value": "[parameters('VirtualNetworkResourceGroupName')]"
           },
           "VmName": {
-            "value": "[variables('VmName')]"
+            "value": "[parameters('VmName')]"
           },
           "VmSize": {
             "value": "[parameters('VmSize')]"
@@ -1187,16 +1154,16 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp')))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('TemplateSpec_{0}', parameters('Timestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('KeyVault_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[variables('ResourceGroupName')]",
+      "resourceGroup": "[parameters('ResourceGroupName')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1204,10 +1171,10 @@
         "mode": "Incremental",
         "parameters": {
           "AutomationAccountPrincipalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
           "KeyVaultName": {
-            "value": "[variables('KeyVaultName')]"
+            "value": "[parameters('KeyVaultName')]"
           },
           "Location": {
             "value": "[parameters('Location')]"
@@ -1330,8 +1297,8 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp')))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('ResourceGroupName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('AutomationAccount_{0}', parameters('Timestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupName'))]",
         "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', guid(subscription().id, 'CaseWorkerDeploy'))]"
       ]
     },
@@ -1353,7 +1320,7 @@
         "mode": "Incremental",
         "parameters": {
           "PrincipalId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp'))), '2022-09-01').outputs.PrincipalId.value]"
           },
           "RoleDefinitionId": {
             "value": "[variables('RoleDefinitionIds').ReaderAndDataAccess]"
@@ -1392,7 +1359,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupName')), 'Microsoft.Resources/deployments', format('UserAssignedIdentityName_{0}', parameters('Timestamp')))]"
       ]
     }
   ]
