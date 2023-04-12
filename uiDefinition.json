@@ -47,7 +47,7 @@
                                 {
                                     "name": "disk",
                                     "type": "Microsoft.Common.TextBox",
-                                    "label": "disk",
+                                    "label": "Disk",
                                     "placeholder": "disk-fslogix-mgmt",
                                     "defaultValue": "disk-fslogix-mgmt",
                                     "toolTip": "Input the name for the virtual machine disk.",
@@ -148,19 +148,44 @@
                     ]
                 },
                 {
-                    "name": "fileShares",
-                    "label": "File Shares",
+                    "name": "fileShare",
+                    "label": "File Share",
                     "elements": [
                         {
-                            "name": "shareSelector",
+                            "name": "storageAccountSelection",
                             "type": "Microsoft.Solutions.ResourceSelector",
-                            "label": "Select Azure Files shares",
-                            "resourceType": "Microsoft.Storage/storageAccounts/files/shares",
+                            "visible": true,
+                            "label": "Storage account",
+                            "resourceType": "Microsoft.Storage/storageAccounts",
+                            "constraints": {
+                                "required": true
+                            },
                             "options": {
                                 "filter": {
                                     "subscription": "onBasics",
                                     "location": "onBasics"
                                 }
+                            }
+                        },
+                        {
+                            "name": "fileShareApi",
+                            "type": "Microsoft.Solutions.ArmApiControl",
+                            "request": {
+                                "method": "GET",
+                                "path": "[concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/', first(skip(split(steps('basics').storageAccountSelection.id, '/'), 4)),'/providers/Microsoft.Storage/storageAccounts/', steps('basics').storageAccountSelection.name, '/fileServices/default/shares?api-version=2022-09-01')]"
+                            }
+                        },
+                        {
+                            "name": "fileShareSelection",
+                            "type": "Microsoft.Common.DropDown",
+                            "visible": true,
+                            "filter": true,
+                            "label": "File share",
+                            "defaultValue": "",
+                            "toolTip": "Select the file share to manage its quota.",
+                            "constraints": {
+                                "allowedValues": "[map(steps('basics').fileShareApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+                                "required": true
                             }
                         }
                     ]
@@ -265,8 +290,8 @@
                                     },
                                     "constraints": {
                                         "required": true,
-                                        "customPasswordRegex": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{12,}$",
-                                        "customValidationMessage": "The password must be alphanumeric, contain at least 12 characters, and have at least 1 letter and 1 number."
+                                        "customPasswordRegex": "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{12,}$",
+                                        "customValidationMessage": "The password must contain at least 12 characters, and have at least 1 letter, 1 number, and 1 special character."
                                     },
                                     "options": {
                                         "hideConfirmation": false
@@ -291,6 +316,9 @@
                                             "subscription": "onBasics",
                                             "location": "onBasics"
                                         }
+                                    },
+                                    "constraints": {
+                                        "required": true
                                     }
                                 },
                                 {
@@ -309,6 +337,7 @@
                                     "defaultValue": "",
                                     "toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
                                     "constraints": {
+                                        "required": true,
                                         "allowedValues": "[map(steps('virtualMachine').network.subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
                                     }
                                 }
@@ -356,7 +385,7 @@
                                 "width": "Full",
                                 "rows": {
                                     "count": {
-                                        "min": 1,
+                                        "min": 0,
                                         "max": 10
                                     }
                                 },
@@ -399,7 +428,7 @@
                 "AutomationAccountName": "[steps('basics').names.automationAccount]",
                 "DeleteOlderThanDays": "[steps('automation').days]",
                 "DiskName": "[steps('basics').names.disk]",
-                "FileShareResourceIds": "[steps('fileShares').shareSelector]",
+                "FileShareResourceId": "[steps('fileShare').fileShareSelection.id]",
                 "Frequency": "[steps('automation').frequency]",
                 "HybridUseBenefit": "[steps('virtualMachine').hybridUseBenefit]",
                 "KeyVaultName": "[steps('basics').names.keyVault]",
@@ -407,7 +436,7 @@
                 "NicName": "[steps('basics').names.nic]",
                 "ResourceGroupName": "[steps('basics').names.resourceGroup]",
                 "SubnetName": "[steps('virtualMachine').network.subnet]",
-                "Tags": "[steps('').]",
+                "Tags": "[replace(concat('{', map(steps('tags').customTags, (item) => parse(concat('\"', item.name, '\": \"', item.value, '\",'))), '}'), ',}', '}')]",
                 "TemplateSpecName": "[steps('basics').names.templateSpec]",
                 "UserAssignedIdentityName": "[steps('basics').names.userAssignedIdentity]",
                 "VirtualNetworkName": "[steps('virtualMachine').network.virtualNetwork.name]",
