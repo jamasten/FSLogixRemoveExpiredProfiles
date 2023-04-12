@@ -1,8 +1,8 @@
-# Azure Virtual Desktop - Remove Expired FSLogix Containers
+# Remove Expired FSLogix Containers
 
 ## Description
 
-This solution will deploy a virtual machine to run the [Invoke-FslShrinkDisk](https://github.com/FSLogix/Invoke-FslShrinkDisk/blob/master/Invoke-FslShrinkDisk.ps1) tool against your SMB shares to remove VHDs older than the specified amount of days. The frequency can be set to daily, weekly, or monthly. Once the tool has completed, the virtual machine is deleted to save on compute and storage charges. The following resources are deployed in this solution:
+This solution will deploy a virtual machine to run Jim Moyle's [Invoke-FslShrinkDisk](https://github.com/FSLogix/Invoke-FslShrinkDisk/blob/master/Invoke-FslShrinkDisk.ps1) tool against your Azure Files shares to remove VHDs older than the specified amount of days. The frequency can be set to daily, weekly, or monthly. Once the tool has completed, the virtual machine is deleted to save on compute and storage charges. The following resources are deployed in this solution:
 
 * Automation Account
   * Job Schedule
