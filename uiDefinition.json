@@ -436,7 +436,7 @@
                 "NicName": "[steps('basics').names.nic]",
                 "ResourceGroupName": "[steps('basics').names.resourceGroup]",
                 "SubnetName": "[steps('virtualMachine').network.subnet]",
-                "Tags": "[parse(replace(replace(replace(replace(string(map(steps('basics').customTags, (item) => parse(concat('{\"', item.name, '\": \"', item.value, '\"}')))), '{', ''), '}', ''), '[', '{'), ']', '}'))]",
+                "Tags": "[parse(replace(replace(replace(replace(string(map(steps('tags').customTags, (item) => parse(concat('{\"', item.name, '\": \"', item.value, '\"}')))), '{', ''), '}', ''), '[', '{'), ']', '}'))]",
                 "TemplateSpecName": "[steps('basics').names.templateSpec]",
                 "UserAssignedIdentityName": "[steps('basics').names.userAssignedIdentity]",
                 "VirtualNetworkName": "[steps('virtualMachine').network.virtualNetwork.name]",
