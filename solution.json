@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.16.1.55165",
-      "templateHash": "1356725422016605653"
+      "version": "0.16.2.56959",
+      "templateHash": "17278104118310648403"
     }
   },
   "parameters": {
@@ -107,7 +107,7 @@
     "SubnetName": {
       "type": "string",
       "metadata": {
-        "description": "The subnet for the AVD session hosts."
+        "description": "The name of the subnet for the virtual machine."
       }
     },
     "Tags": {
@@ -141,13 +141,13 @@
     "VirtualNetworkName": {
       "type": "string",
       "metadata": {
-        "description": "Virtual network for the virtual machine to run the tool."
+        "description": "The name of the virtual network for the virtual machine NIC."
       }
     },
     "VirtualNetworkResourceGroupName": {
       "type": "string",
       "metadata": {
-        "description": "Virtual network resource group for the virtual machine to run the tool."
+        "description": "The name of the resource group for the virtual network."
       }
     },
     "VmName": {
@@ -301,8 +301,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "4789894668860949867"
+              "version": "0.16.2.56959",
+              "templateHash": "4632820761873142589"
             }
           },
           "parameters": {
@@ -365,8 +365,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "18254137260717774898"
+              "version": "0.16.2.56959",
+              "templateHash": "8636418523283421933"
             }
           },
           "parameters": {
@@ -385,7 +385,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.1.55165",
-                  "templateHash": "8731387486089427262"
+                  "templateHash": "8456199519922556835"
                 }
               },
               "parameters": {
@@ -395,8 +395,8 @@
                 "DiskName": {
                   "type": "string"
                 },
-                "FileShareResourceIds": {
-                  "type": "array"
+                "FileShareResourceId": {
+                  "type": "string"
                 },
                 "HybridUseBenefit": {
                   "type": "bool"
@@ -465,8 +465,8 @@
                       "DiskName": {
                         "value": "[[parameters('DiskName')]"
                       },
-                      "FileShareResourceIds": {
-                        "value": "[[parameters('FileShareResourceIds')]"
+                      "FileShareResourceId": {
+                        "value": "[[parameters('FileShareResourceId')]"
                       },
                       "HybridUseBenefit": {
                         "value": "[[parameters('HybridUseBenefit')]"
@@ -531,7 +531,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.16.1.55165",
-                          "templateHash": "15744933279881007180"
+                          "templateHash": "17629234333186626641"
                         }
                       },
                       "parameters": {
@@ -541,8 +541,8 @@
                         "DiskName": {
                           "type": "string"
                         },
-                        "FileShareResourceIds": {
-                          "type": "array"
+                        "FileShareResourceId": {
+                          "type": "string"
                         },
                         "HybridUseBenefit": {
                           "type": "bool"
@@ -706,7 +706,7 @@
                               "timestamp": "[[parameters('Timestamp')]"
                             },
                             "protectedSettings": {
-                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceIds {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceIds'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                             }
                           },
                           "dependsOn": [
@@ -852,8 +852,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "5937121850418991194"
+              "version": "0.16.2.56959",
+              "templateHash": "15416474590407633938"
             }
           },
           "parameters": {
@@ -1114,8 +1114,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.16.1.55165",
-                      "templateHash": "9766569436966301097"
+                      "version": "0.16.2.56959",
+                      "templateHash": "3696674006868573074"
                     }
                   },
                   "parameters": {
@@ -1198,8 +1198,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "1528713095736407423"
+              "version": "0.16.2.56959",
+              "templateHash": "14356124714545670482"
             }
           },
           "parameters": {
@@ -1326,8 +1326,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.16.1.55165",
-              "templateHash": "9766569436966301097"
+              "version": "0.16.2.56959",
+              "templateHash": "3696674006868573074"
             }
           },
           "parameters": {
