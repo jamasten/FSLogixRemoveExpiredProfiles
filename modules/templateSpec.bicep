@@ -7,7 +7,7 @@ resource templateSpec 'Microsoft.Resources/templateSpecs@2021-05-01' = {
   location: Location
   properties: {
     description: 'Deploys a virtual machine to run the "FSLogix Disk Shrink" tool against an SMB share containing FSLogix profile containers.'
-    displayName: 'FSLogix Disk Shrink solution'
+    displayName: 'Remove Expired FSLogix Containers'
   }
 }
 

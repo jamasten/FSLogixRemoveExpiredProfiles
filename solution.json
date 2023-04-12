@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "14853439493062242724"
+      "templateHash": "15322912505151101396"
     }
   },
   "parameters": {
@@ -366,7 +366,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "8636418523283421933"
+              "templateHash": "2200001974765779985"
             }
           },
           "parameters": {
@@ -384,8 +384,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.16.1.55165",
-                  "templateHash": "8456199519922556835"
+                  "version": "0.16.2.56959",
+                  "templateHash": "10293200130020812465"
                 }
               },
               "parameters": {
@@ -530,8 +530,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.16.1.55165",
-                          "templateHash": "17629234333186626641"
+                          "version": "0.16.2.56959",
+                          "templateHash": "8031198750288228536"
                         }
                       },
                       "parameters": {
@@ -701,12 +701,12 @@
                             "autoUpgradeMinorVersion": true,
                             "settings": {
                               "fileUris": [
-                                "[[format('{0}Remove-ExpiredFslogixDisks.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
+                                "[[format('{0}Remove-ExpiredFslogixContainers.ps1{1}', parameters('ScriptUri'), parameters('SasToken'))]"
                               ],
                               "timestamp": "[[parameters('Timestamp')]"
                             },
                             "protectedSettings": {
-                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixDisks.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
+                              "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File Remove-ExpiredFslogixContainers.ps1 -DeleteOlderThanDays {0} -Environment {1} -FileShareResourceId {2} -StorageAccountSuffix {3} -SubscriptionId {4} -TenantId {5} -UserAssignedIdentityClientId {6}', parameters('DeleteOlderThanDays'), environment().name, parameters('FileShareResourceId'), variables('StorageAccountSuffix'), subscription().subscriptionId, subscription().tenantId, parameters('UserAssignedIdentityClientId'))]"
                             }
                           },
                           "dependsOn": [
@@ -728,7 +728,7 @@
               "location": "[parameters('Location')]",
               "properties": {
                 "description": "Deploys a virtual machine to run the \"FSLogix Disk Shrink\" tool against an SMB share containing FSLogix profile containers.",
-                "displayName": "FSLogix Disk Shrink solution"
+                "displayName": "Remove Expired FSLogix Containers"
               }
             },
             {
@@ -853,7 +853,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "15416474590407633938"
+              "templateHash": "7277627850663178349"
             }
           },
           "parameters": {
@@ -965,7 +965,7 @@
               "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('RunbookName'))]",
               "location": "[parameters('Location')]",
               "properties": {
-                "description": "FSLogix Disk Shrink Automation",
+                "description": "Remove Expired FSLogix Containers",
                 "runbookType": "PowerShell",
                 "logProgress": false,
                 "logVerbose": false,

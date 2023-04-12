@@ -49,7 +49,7 @@ resource runbook 'Microsoft.Automation/automationAccounts/runbooks@2019-06-01' =
   name: RunbookName
   location: Location
   properties: {
-    description: 'FSLogix Disk Shrink Automation'
+    description: 'Remove Expired FSLogix Containers'
     runbookType: 'PowerShell'
     logProgress: false
     logVerbose: false
