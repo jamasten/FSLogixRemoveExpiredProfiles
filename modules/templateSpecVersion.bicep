@@ -8,7 +8,6 @@ param NicName string
 param SasToken bool
 param ScriptUri string
 param SubnetName string
-param Tags object = {}
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 param UserAssignedIdentityClientId string
 param UserAssignedIdentityResourceId string
@@ -34,7 +33,7 @@ module virtualMachine 'virtualMachine.bicep' = {
     NicName: NicName
     ScriptUri: ScriptUri
     SubnetName: SubnetName
-    Tags: Tags
+    Tags: keyVault.tags
     Timestamp: Timestamp
     UserAssignedIdentityClientId: UserAssignedIdentityClientId
     UserAssignedIdentityResourceId: UserAssignedIdentityResourceId

@@ -50,10 +50,6 @@ param(
 
 	[Parameter(Mandatory)]
 	[string]
-	$Tags,
-
-	[Parameter(Mandatory)]
-	[string]
 	$TemplateSpecId,
 
 	[Parameter(Mandatory)]
@@ -112,7 +108,6 @@ try
 		-SasToken $([bool]::Parse($SasToken)) `
 		-ScriptUri $ScriptUri `
 		-SubnetName $SubnetName `
-		-Tags $(if(!($Tags -eq 'None')){$Tags | ConvertFrom-Json}else{@{}}) `
 		-UserAssignedIdentityClientId $UserAssignedIdentityClientId `
 		-UserAssignedIdentityResourceId $UserAssignedIdentityResourceId `
 		-VirtualNetworkName $VirtualNetworkName `

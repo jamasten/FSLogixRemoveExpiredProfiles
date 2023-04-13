@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "15322912505151101396"
+      "templateHash": "883522403236615959"
     }
   },
   "parameters": {
@@ -366,7 +366,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "2200001974765779985"
+              "templateHash": "6791795373142697576"
             }
           },
           "parameters": {
@@ -385,7 +385,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.16.2.56959",
-                  "templateHash": "10293200130020812465"
+                  "templateHash": "14304165240806120353"
                 }
               },
               "parameters": {
@@ -419,10 +419,6 @@
                 },
                 "SubnetName": {
                   "type": "string"
-                },
-                "Tags": {
-                  "type": "object",
-                  "defaultValue": {}
                 },
                 "Timestamp": {
                   "type": "string",
@@ -484,7 +480,7 @@
                         "value": "[[parameters('SubnetName')]"
                       },
                       "Tags": {
-                        "value": "[[parameters('Tags')]"
+                        "value": "[[reference(resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName')), '2022-07-01', 'full').tags]"
                       },
                       "Timestamp": {
                         "value": "[[parameters('Timestamp')]"
@@ -853,7 +849,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.16.2.56959",
-              "templateHash": "7277627850663178349"
+              "templateHash": "13707771316816639860"
             }
           },
           "parameters": {
@@ -1012,7 +1008,6 @@
                   "ScriptUri": "[parameters('_artifactsLocation')]",
                   "SubnetName": "[parameters('SubnetName')]",
                   "SubscriptionId": "[subscription().subscriptionId]",
-                  "Tags": "[if(empty(parameters('Tags')), 'None', string(parameters('Tags')))]",
                   "TemplateSpecId": "[parameters('TemplateSpecVersionResourceId')]",
                   "TenantId": "[subscription().tenantId]",
                   "UserAssignedIdentityClientId": "[parameters('UserAssignedIdentityClientId')]",

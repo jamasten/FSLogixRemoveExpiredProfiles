@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "10293200130020812465"
+      "templateHash": "14304165240806120353"
     }
   },
   "parameters": {
@@ -39,10 +39,6 @@
     },
     "SubnetName": {
       "type": "string"
-    },
-    "Tags": {
-      "type": "object",
-      "defaultValue": {}
     },
     "Timestamp": {
       "type": "string",
@@ -104,7 +100,7 @@
             "value": "[parameters('SubnetName')]"
           },
           "Tags": {
-            "value": "[parameters('Tags')]"
+            "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName')), '2022-07-01', 'full').tags]"
           },
           "Timestamp": {
             "value": "[parameters('Timestamp')]"
