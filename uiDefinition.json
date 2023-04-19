@@ -39,8 +39,8 @@
                                     "toolTip": "Input the name for the automation account.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^[a-zA-Z][a-zA-Z0-9-]{4,48}[a-zA-Z0-9]$",
+                                        "validationMessage": "The value must be between 6 and 50 characters with alphanumerics and hyphens, start with a letter, and end with an alphanumeric."
                                     },
                                     "visible": true
                                 },
@@ -53,10 +53,31 @@
                                     "toolTip": "Input the name for the virtual machine disk.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^[a-zA-Z0-9_-]{1,80}$",
+                                        "validationMessage": "The value must be between 1 and 80 characters with alphanumerics, underscores, and hyphens."
                                     },
                                     "visible": true
+                                },
+                                {
+                                    "name": "keyVault_checkNameAvailability",
+                                    "type": "Microsoft.Solutions.ArmApiControl",
+                                    "request": {
+                                        "method": "POST",
+                                        "path": "[concat(steps('basics').resourceScope.subscription.id,'/providers/Microsoft.KeyVault/checkNameAvailability?api-version=2022-07-01')]",
+                                        "body": {
+                                            "name": "[steps('basics').names.keyVault]",
+                                            "type": "Microsoft.KeyVault/vaults"
+                                        }
+                                    }
+                                },
+                                {
+                                    "name": "keyVault_rePUT",
+                                    "type": "Microsoft.Solutions.ArmApiControl",
+                                    "request": {
+                                        "method": "GET",
+                                        "path": "[concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/',steps('basics').resourceScope.resourceGroup.name,'/providers/Microsoft.KeyVault/vaults/',steps('basics').names.keyVault,'?api-version=2022-07-01')]",
+                                        "body": {}
+                                    }
                                 },
                                 {
                                     "name": "keyVault",
@@ -67,8 +88,16 @@
                                     "toolTip": "Input the name for the key vault.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "validations": [
+                                            {
+                                                "isValid": "[or(steps('basics').names.keyVault_checkNameAvailability.nameAvailable,equals(steps('basics').names.keyVault_checkNameAvailability.reason,'AlreadyExists'))]",
+                                                "message": "[steps('basics').names.keyVault_checkNameAvailability.message]"
+                                            },
+                                            {
+                                                "isValid": "[or(steps('basics').names.keyVault_checkNameAvailability.nameAvailable,equals(steps('basics').names.keyVault_rePUT.id,concat(steps('basics').resourceScope.subscription.id,'/resourceGroups/',steps('basics').resourceScope.resourceGroup.name,'/providers/Microsoft.Storage/storageAccounts/',steps('basics').names.keyVault)),not(equals(steps('basics').names.keyVault_checkNameAvailability.reason,'AlreadyExists')))]",
+                                                "message": "[steps('basics').names.keyVault_checkNameAvailability.message]"
+                                            }
+                                        ]
                                     },
                                     "visible": true
                                 },
@@ -81,8 +110,8 @@
                                     "toolTip": "Input the name for the virtual machine network interface.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\\.-]{0,78}[a-zA-Z0-9_])$",
+                                        "validationMessage": "The value must be between 1 and 80 characters with alphanumerics, underscores, periods, and hyphens. The value must start with an alphanumeric and end with an alphanumeric or underscore."
                                     },
                                     "visible": true
                                 },
@@ -95,8 +124,8 @@
                                     "toolTip": "Input the name for the resource group.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^(?!.*[\\.]$)[a-zA-Z0-9_\\.()-]{1,90}$",
+                                        "validationMessage": "The value must be between 1 and 90 characters with alphanumerics, underscores, parentheses, hyphens, periods, and unicode characters that match the regex documentation."
                                     },
                                     "visible": true
                                 },
@@ -109,8 +138,8 @@
                                     "toolTip": "Input the name for the template spec.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^[a-zA-Z0-9_\\.()-]{1,90}$",
+                                        "validationMessage": "The value must be between 1 and 90 characters with alphanumerics, underscores, parentheses, hyphens, and periods."
                                     },
                                     "visible": true
                                 },
@@ -123,8 +152,8 @@
                                     "toolTip": "Input the name for the user assigned identity.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^[a-zA-Z0-9][a-zA-Z0-9_-]{2,127}$",
+                                        "validationMessage": "The value must be between 3 and 128 characters with alphanumerics, hyphens, and underscores. The value must start with a letter or number."
                                     },
                                     "visible": true
                                 },
@@ -137,8 +166,8 @@
                                     "toolTip": "Input the name for the virtual machine.",
                                     "constraints": {
                                         "required": true,
-                                        "regex": "",
-                                        "validationMessage": ""
+                                        "regex": "^(?!.*-$)[^\\/\\[\\]:|<>\\+=;,\\?@&_\\. \\*]{1,15}$",
+                                        "validationMessage": "The value must be between 1 and 15 characters. The value cannot contain any of the following: backslash, slash, double quote, single quote, square brackets, colon, pipe, angle brackets, plus sign, equals sign, semi-colon, comma, question mark, asterisk, at sign, ampersand, underscore, space, or period. The value cannot end with a hyphen."
                                     },
                                     "visible": true
                                 }

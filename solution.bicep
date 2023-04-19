@@ -8,12 +8,16 @@ param _artifactsLocation string = 'https://raw.githubusercontent.com/jamasten/FS
 @description('The SAS Token for the scripts if they are stored on an Azure Storage Account.')
 param _artifactsLocationSasToken string = ''
 
+@maxLength(50)
+@minLength(6)
 @description('The name of the Azure Automation account.')
 param AutomationAccountName string = 'aa-fslogix-mgmt'
 
 @description('The amount of days to keep an unused FSLogix profile before deleting it.')
 param DeleteOlderThanDays int = 1
 
+@maxLength(80)
+@minLength(1)
 @description('The name of the managed disk on the Azure virtual machine')
 param DiskName string = 'disk-fslogix-mgmt'
 
@@ -31,6 +35,8 @@ param Frequency string = 'Daily'
 @description('Choose whether to enable the Hybrid Use Benefit on the virtual machine.  This is only valid you have appropriate licensing with Software Assurance. https://docs.microsoft.com/en-us/windows-server/get-started/azure-hybrid-benefit')
 param HybridUseBenefit bool = false
 
+@maxLength(24)
+@minLength(3)
 @description('The name of the Azure key vault.')
 param KeyVaultName string = 'kv-fslogix-mgmt'
 
@@ -40,9 +46,13 @@ param Location string = deployment().location
 @description('The resource ID for the Log Analytics Workspace to collect log data and send alerts.')
 param LogAnalyticsWorkspaceResourceId string = ''
 
+@maxLength(80)
+@minLength(1)
 @description('The name of the network interface on the Azure virtual machine.')
 param NicName string = 'nic-fslogix-mgmt'
 
+@maxLength(90)
+@minLength(1)
 @description('The name of the Azure resource group.')
 param ResourceGroupName string = 'rg-fslogix-mgmt'
 
@@ -52,12 +62,16 @@ param SubnetName string
 @description('Add key / value pairs to include metadata on the Azure resources.')
 param Tags object = {}
 
+@maxLength(90)
+@minLength(1)
 @description('The name of the Azure template spec.')
 param TemplateSpecName string = 'ts-fslogix-mgmt'
 
 @description('DO NOT MODIFY THIS VALUE! The timestamp is needed to differentiate deployments for certain Azure resources and must be set using a parameter.')
 param Timestamp string = utcNow('yyyyMMddhhmmss')
 
+@maxLength(128)
+@minLength(3)
 @description('The name of the Azure user assigned managed identity.')
 param UserAssignedIdentityName string = 'uai-fslogix-mgmt'
 
@@ -67,6 +81,8 @@ param VirtualNetworkName string
 @description('The name of the resource group for the virtual network.')
 param VirtualNetworkResourceGroupName string
 
+@maxLength(15)
+@minLength(1)
 @description('The name of the Azure virtual machine.')
 param VmName string = 'vm-fslogix-mgmt'
 

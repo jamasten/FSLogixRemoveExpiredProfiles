@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "883522403236615959"
+      "templateHash": "9226891973212480854"
     }
   },
   "parameters": {
@@ -28,7 +28,9 @@
       "defaultValue": "aa-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure Automation account."
-      }
+      },
+      "minLength": 6,
+      "maxLength": 50
     },
     "DeleteOlderThanDays": {
       "type": "int",
@@ -42,7 +44,9 @@
       "defaultValue": "disk-fslogix-mgmt",
       "metadata": {
         "description": "The name of the managed disk on the Azure virtual machine"
-      }
+      },
+      "minLength": 1,
+      "maxLength": 80
     },
     "FileShareResourceId": {
       "type": "string",
@@ -74,7 +78,9 @@
       "defaultValue": "kv-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure key vault."
-      }
+      },
+      "minLength": 3,
+      "maxLength": 24
     },
     "Location": {
       "type": "string",
@@ -95,14 +101,18 @@
       "defaultValue": "nic-fslogix-mgmt",
       "metadata": {
         "description": "The name of the network interface on the Azure virtual machine."
-      }
+      },
+      "minLength": 1,
+      "maxLength": 80
     },
     "ResourceGroupName": {
       "type": "string",
       "defaultValue": "rg-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure resource group."
-      }
+      },
+      "minLength": 1,
+      "maxLength": 90
     },
     "SubnetName": {
       "type": "string",
@@ -122,7 +132,9 @@
       "defaultValue": "ts-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure template spec."
-      }
+      },
+      "minLength": 1,
+      "maxLength": 90
     },
     "Timestamp": {
       "type": "string",
@@ -136,7 +148,9 @@
       "defaultValue": "uai-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure user assigned managed identity."
-      }
+      },
+      "minLength": 3,
+      "maxLength": 128
     },
     "VirtualNetworkName": {
       "type": "string",
@@ -155,7 +169,9 @@
       "defaultValue": "vm-fslogix-mgmt",
       "metadata": {
         "description": "The name of the Azure virtual machine."
-      }
+      },
+      "minLength": 1,
+      "maxLength": 15
     },
     "VmPassword": {
       "type": "securestring",
