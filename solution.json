@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.16.2.56959",
-      "templateHash": "9226891973212480854"
+      "templateHash": "12188454560409515682"
     }
   },
   "parameters": {
@@ -34,7 +34,7 @@
     },
     "DeleteOlderThanDays": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 90,
       "metadata": {
         "description": "The amount of days to keep an unused FSLogix profile before deleting it."
       }

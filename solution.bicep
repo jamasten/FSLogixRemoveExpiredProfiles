@@ -14,7 +14,7 @@ param _artifactsLocationSasToken string = ''
 param AutomationAccountName string = 'aa-fslogix-mgmt'
 
 @description('The amount of days to keep an unused FSLogix profile before deleting it.')
-param DeleteOlderThanDays int = 1
+param DeleteOlderThanDays int = 90
 
 @maxLength(80)
 @minLength(1)
