@@ -252,7 +252,7 @@
                         {
                             "name": "days",
                             "type": "Microsoft.Common.Slider",
-                            "min": 30,
+                            "min": 1,
                             "max": 1826,
                             "label": "Delete Older Than Days",
                             "showStepMarkers": false,
