@@ -68,7 +68,7 @@ try
     # $AccessToken = $null
     # try
     # {
-	# 	$TokenAuthURI = $env:IDENTITY_ENDPOINT + '?resource=' + $StorageAuthUri + '&api-version=2019-08-01'
+	# 	$TokenAuthURI = $env:IDENTITY_ENDPOINT + '?resource=https://storage.azure.com&api-version=2019-08-01'
 	# 	$TokenResponse = Invoke-RestMethod -Method 'Get' -Headers @{"X-IDENTITY-HEADER"="$env:IDENTITY_HEADER"} -Uri $TokenAuthURI
 	# 	$AccessToken = $TokenResponse.access_token
 	# 	$Header = @{
