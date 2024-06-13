@@ -108,20 +108,19 @@ try
 	# $elementValue = $xmlObject.root.elementName
 	# Write-Output $elementValue
 
+	Write-Log -StorageAccountName $StorageAccountName -Message "Get context for '$StorageAccountName'"
 
 	$Context = (Get-AzStorageAccount -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName).Context
 
-	Write-Log -StorageAccountName $StorageAccountName -Message "Get context for '$StorageAccountName'"
+	Write-Log -StorageAccountName $StorageAccountName -Message "Get containers for '$StorageAccountName'"
 
 	[array]$Containers = (Get-AzStorageContainer -Context $Context).Name
 
 	foreach ($Container in $Containers)
 	{
-		Write-Log -StorageAccountName $StorageAccountName -Message "Get containers for '$StorageAccountName/$Container'"
+		Write-Log -StorageAccountName $StorageAccountName -Message "Get VHD(X) for '$StorageAccountName/$Container'"
 
 		$VHD = Get-AzStorageBlob -Container $Container -Context $Context | Where-Object {$_.Name -like '*.vhdx' -or $_.Name -like '*.vhd'}
-
-		Write-Log -StorageAccountName $StorageAccountName -Message "Get VHD(X) for '$StorageAccountName/$Container'"
 
 		if($VHD.LastModified.DateTime -lt (Get-Date -AsUTC).AddDays(-$ExpirationInNumberOfDays))
 		{
